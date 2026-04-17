@@ -1001,6 +1001,8 @@
         }
 
         function saveOrder() {
+            console.log("🔍 Iniciando saveOrder...");
+            
             const name = document.getElementById('orderName').value;
             const month = document.getElementById('orderMonth').value;
             const date = document.getElementById('orderDate').value;
@@ -1009,6 +1011,8 @@
             const total = parseFloat(document.getElementById('orderTotal').value) || 0;
             const notes = document.getElementById('orderNotes').value;
             
+            console.log("Dados:", {name, month, date, pieces});
+            
             if (!name || !pieces) {
                 alert('Preencha nome da cliente e peças!');
                 return;
@@ -1016,41 +1020,55 @@
             
             const editingId = document.getElementById('orderModal').dataset.editingId;
             
-            if (editingId !== undefined && editingId !== '') {
-                // Editando pedido existente
-                const idx = parseInt(editingId);
-                orders[idx] = {
-                    ...orders[idx],
-                    name,
-                    month,
-                    date: date || null,
-                    shipping,
-                    pieces,
-                    total,
-                    notes
-                };
-                delete document.getElementById('orderModal').dataset.editingId;
-            } else {
-                // Novo pedido
-                const order = {
-                    id: 'order_' + Date.now(),
-                    name,
-                    month,
-                    date: date || null,
-                    shipping,
-                    pieces,
-                    total,
-                    notes,
-                    status: 'pending'
-                };
-                orders.push(order);
+            try {
+                if (editingId !== undefined && editingId !== '') {
+                    console.log("✏️ Editando pedido...");
+                    const idx = parseInt(editingId);
+                    orders[idx] = {
+                        ...orders[idx],
+                        name,
+                        month,
+                        date: date || null,
+                        shipping,
+                        pieces,
+                        total,
+                        notes
+                    };
+                    delete document.getElementById('orderModal').dataset.editingId;
+                } else {
+                    console.log("➕ Criando novo pedido...");
+                    const order = {
+                        id: 'order_' + Date.now(),
+                        name,
+                        month,
+                        date: date || null,
+                        shipping,
+                        pieces,
+                        total,
+                        notes,
+                        status: 'pending'
+                    };
+                    orders.push(order);
+                }
+                
+                console.log("💾 Salvando localStorage...");
+                localStorage.setItem('olive_orders', JSON.stringify(orders));
+                
+                console.log("🔄 Sincronizando Firebase...");
+                syncToFirebase('orders');
+                
+                console.log("📋 Fechando modal...");
+                closeModal('orderModal');
+                
+                console.log("🎨 Renderizando...");
+                renderProximos();
+                renderConcluidos();
+                
+                console.log("✅ Pedido salvo com sucesso!");
+            } catch(error) {
+                console.error("❌ Erro em saveOrder:", error);
+                alert("Erro: " + error.message);
             }
-            
-            localStorage.setItem('olive_orders', JSON.stringify(orders));
-            syncToFirebase('orders');
-            closeModal('orderModal');
-            renderProximos();
-            renderConcluidos();
         }
 
         function openAddTrackerModal() {
