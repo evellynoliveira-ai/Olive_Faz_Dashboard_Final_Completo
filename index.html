@@ -705,38 +705,36 @@
             databaseURL: "https://olivefazdashboard.firebaseio.com"
         };
 
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        
         let firebaseReady = false;
+        let db = null;
 
-        // Testar conexão com Firebase
-        db.collection("sync").doc("test").set({timestamp: new Date()})
-            .then(() => {
-                firebaseReady = true;
-                console.log("✅ Firebase conectado!");
-            })
-            .catch((error) => {
-                firebaseReady = false;
-                console.log("⚠️ Firebase offline - usando localStorage");
-            });
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            firebaseReady = true;
+            console.log("✅ Firebase carregado");
+        } catch(error) {
+            console.log("⚠️ Firebase não disponível:", error);
+            firebaseReady = false;
+        }
 
-        // Salvar no Firebase
-        async function syncToFirebase(type) {
-            if (!firebaseReady) return;
+        // Salvar no Firebase (não bloqueia se falhar)
+        function syncToFirebase(type) {
+            if (!firebaseReady || !db) return;
             
             try {
                 if (type === 'orders') {
-                    await db.collection("orders").doc("data").set({items: orders, updatedAt: new Date()});
+                    db.collection("orders").doc("data").set({items: orders, updatedAt: new Date()})
+                        .catch(e => console.log("Erro sync orders:", e));
                 } else if (type === 'tasks') {
-                    await db.collection("tasks").doc("data").set({items: tasks, updatedAt: new Date()});
+                    db.collection("tasks").doc("data").set({items: tasks, updatedAt: new Date()})
+                        .catch(e => console.log("Erro sync tasks:", e));
                 } else if (type === 'stock') {
-                    await db.collection("stock").doc("data").set({items: stock, updatedAt: new Date()});
+                    db.collection("stock").doc("data").set({items: stock, updatedAt: new Date()})
+                        .catch(e => console.log("Erro sync stock:", e));
                 }
-                console.log(`✅ ${type} sincronizado!`);
             } catch(error) {
-                console.log(`⚠️ Erro ao sincronizar:`, error);
+                console.log("Firebase indisponível");
             }
         }
 
