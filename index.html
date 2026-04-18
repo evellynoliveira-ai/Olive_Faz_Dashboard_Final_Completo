@@ -343,7 +343,7 @@
             
             <div class="form-group">
                 <label class="form-label">Nome da Cliente *</label>
-                <input type="text" id="orderName" class="form-input" placeholder="Maria">
+                <input type="text" id="orderName" class="form-input" placeholder="Maria ou Ana">
             </div>
             
             <div class="form-group">
@@ -358,12 +358,12 @@
             
             <div class="form-group">
                 <label class="form-label">Valor Total (R$)</label>
-                <input type="number" id="orderTotal" class="form-input" step="0.10" placeholder="0.00">
+                <input type="number" id="orderTotal" class="form-input" step="0.01" placeholder="0.00">
             </div>
             
             <div class="form-group">
                 <label class="form-label">Frete (R$)</label>
-                <input type="number" id="orderFreight" class="form-input" step="0.10" placeholder="0.00">
+                <input type="number" id="orderFreight" class="form-input" step="0.01" placeholder="0.00">
             </div>
             
             <div class="form-group">
@@ -385,7 +385,7 @@
             
             <div class="form-group">
                 <label class="form-label">Tarefa *</label>
-                <textarea id="taskTitle" class="form-input" placeholder="Qual sua próxima tarefa/ação?" style="min-height: 60px;"></textarea>
+                <textarea id="taskTitle" class="form-input" placeholder="O que você precisa fazer?" style="min-height: 60px;"></textarea>
             </div>
             
             <div class="form-group">
@@ -408,8 +408,13 @@
         // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDdG0O7FdnOP6h6_kxBkidiJPrdfR68CvM",
+            authDomain: "olivefazdashboard.firebaseapp.com",
+            databaseURL: "https://olivefazdashboard-default-rtdb.firebaseio.com",
             projectId: "olivefazdashboard",
-            databaseURL: "https://olivefazdashboard-default-rtdb.firebaseio.com"
+            storageBucket: "olivefazdashboard.firebasestorage.app",
+            messagingSenderId: "1053334296381",
+            appId: "1:1053334296381:web:d73296c3f7091fdc1dd754",
+            measurementId: "G-8XQVW5EM1Y"
         };
 
         let firebaseReady = false;
@@ -475,13 +480,29 @@
             renderAll();
         }
 
-        function openOrderModal() {
+        function openOrderModal(orderId = null) {
             document.getElementById('orderName').value = '';
             document.getElementById('orderDate').value = '';
             document.getElementById('orderPieces').value = '';
             document.getElementById('orderTotal').value = '';
             document.getElementById('orderFreight').value = '';
             document.getElementById('orderNotes').value = '';
+            
+            if (orderId) {
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    document.getElementById('orderName').value = order.name;
+                    document.getElementById('orderDate').value = order.date || '';
+                    document.getElementById('orderPieces').value = order.pieces.map(p => p.name).join(', ');
+                    document.getElementById('orderTotal').value = order.total;
+                    document.getElementById('orderFreight').value = order.freight;
+                    document.getElementById('orderNotes').value = order.notes;
+                    document.getElementById('orderModal').dataset.editingId = orderId;
+                }
+            } else {
+                document.getElementById('orderModal').dataset.editingId = '';
+            }
+            
             document.getElementById('orderModal').classList.add('active');
         }
 
@@ -508,22 +529,42 @@
                 value: 0
             })).filter(p => p.name);
 
-            orders.push({
-                id: 'ord_' + Date.now(),
-                name,
-                date: date || null,
-                pieces: piecesArray,
-                total,
-                freight,
-                notes,
-                status: 'pending',
-                createdAt: new Date().toISOString()
-            });
+            const editingId = document.getElementById('orderModal').dataset.editingId;
+            
+            if (editingId) {
+                // Editar pedido existente
+                const order = orders.find(o => o.id === editingId);
+                if (order) {
+                    order.name = name;
+                    order.date = date || null;
+                    order.pieces = piecesArray;
+                    order.total = total;
+                    order.freight = freight;
+                    order.notes = notes;
+                }
+            } else {
+                // Novo pedido
+                orders.push({
+                    id: 'ord_' + Date.now(),
+                    name,
+                    date: date || null,
+                    pieces: piecesArray,
+                    total,
+                    freight,
+                    notes,
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                });
+            }
 
             localStorage.setItem('olive_orders', JSON.stringify(orders));
             syncFirebase();
             closeModal('orderModal');
             renderAll();
+        }
+
+        function editOrder(id) {
+            openOrderModal(id);
         }
 
         function deleteOrder(id) {
