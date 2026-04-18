@@ -88,6 +88,11 @@
             background: #FFF5F0;
         }
         
+        .card.alert {
+            border-left: 4px solid #FF6B00;
+            background: #FFF0E6;
+        }
+        
         .card-header {
             font-weight: 600;
             font-size: 15px;
@@ -174,7 +179,7 @@
             display: block;
         }
         
-        .form-input {
+        .form-input, .form-select {
             width: 100%;
             padding: 8px 12px;
             border: 1px solid #e0e0e0;
@@ -182,7 +187,7 @@
             font-size: 13px;
         }
         
-        .form-input:focus {
+        .form-input:focus, .form-select:focus {
             outline: none;
             border-color: #D85A30;
             box-shadow: 0 0 0 2px rgba(216,90,48,0.1);
@@ -216,28 +221,6 @@
             color: #666;
         }
         
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            margin-bottom: 1rem;
-        }
-        
-        .calendar-day {
-            aspect-ratio: 1;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            cursor: pointer;
-        }
-        
-        .calendar-day:hover { background: #f5f5f5; }
-        .calendar-day.today { background: #E6F7E6; color: #080; font-weight: 600; }
-        
         .pieces-list {
             margin-top: 0.75rem;
             padding-top: 0.75rem;
@@ -255,28 +238,24 @@
             align-items: center;
         }
         
-        .status-badge {
-            font-size: 10px;
-            padding: 2px 6px;
-            background: #E6F0FF;
-            color: #0066CC;
-            border-radius: 3px;
-        }
-        
-        .late-badge {
-            background: #FFE6E6;
-            color: #C00;
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
         .empty-state {
             color: #888;
             text-align: center;
             padding: 2rem;
+        }
+        
+        .stock-quantity {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        
+        .stock-quantity input {
+            width: 60px;
+            padding: 4px;
+            border: 1px solid #e0e0e0;
+            border-radius: 3px;
+            font-size: 12px;
         }
         
         @media (max-width: 600px) {
@@ -297,9 +276,10 @@
         <button class="tab-btn active" onclick="switchTab('proximos')">🚀 Próximos</button>
         <button class="tab-btn" onclick="switchTab('pedidos')">📋 Pedidos</button>
         <button class="tab-btn" onclick="switchTab('tarefas')">✓ Tarefas</button>
-        <button class="tab-btn" onclick="switchTab('calendario')">📅 Calendário</button>
-        <button class="tab-btn" onclick="switchTab('rastreador')">🎨 Rastreador</button>
-        <button class="tab-btn" onclick="switchTab('concluidos')">✅ Concluídos</button>
+        <button class="tab-btn" onclick="switchTab('calendario')">📅 Cal</button>
+        <button class="tab-btn" onclick="switchTab('rastreador')">🎨 Rastear</button>
+        <button class="tab-btn" onclick="switchTab('estoque')">📦 Estoque</button>
+        <button class="tab-btn" onclick="switchTab('concluidos')">✅ Concl.</button>
     </div>
     
     <div class="container">
@@ -330,6 +310,12 @@
             <div id="rastreador-content"></div>
         </div>
         
+        <!-- ESTOQUE -->
+        <div id="estoque" class="tab-content">
+            <button class="btn-primary" onclick="openStockModal()">+ Novo Item</button>
+            <div id="estoque-content"></div>
+        </div>
+        
         <!-- CONCLUÍDOS -->
         <div id="concluidos" class="tab-content">
             <div id="concluidos-content"></div>
@@ -340,6 +326,7 @@
     <div id="orderModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">Novo Pedido</div>
+            <input type="hidden" id="orderEditId">
             
             <div class="form-group">
                 <label class="form-label">Nome da Cliente *</label>
@@ -372,7 +359,7 @@
             </div>
             
             <div class="modal-actions">
-                <button class="btn-save" onclick="saveOrder()">Criar Pedido</button>
+                <button class="btn-save" onclick="saveOrder()">Salvar Pedido</button>
                 <button class="btn-cancel" onclick="closeModal('orderModal')">Cancelar</button>
             </div>
         </div>
@@ -393,9 +380,52 @@
                 <input type="date" id="taskDate" class="form-input">
             </div>
             
+            <div class="form-group">
+                <label class="form-label">Periodicidade</label>
+                <select id="taskPeriod" class="form-select">
+                    <option value="once">Apenas uma vez</option>
+                    <option value="daily">Diária</option>
+                    <option value="weekly">Semanal</option>
+                    <option value="monthly">Mensal</option>
+                    <option value="custom">Personalizada</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="customPeriodGroup" style="display: none;">
+                <label class="form-label">A cada quantos dias?</label>
+                <input type="number" id="taskCustomDays" class="form-input" placeholder="7" min="1">
+            </div>
+            
             <div class="modal-actions">
                 <button class="btn-save" onclick="saveTask()">Criar Tarefa</button>
                 <button class="btn-cancel" onclick="closeModal('taskModal')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL NOVO ITEM ESTOQUE -->
+    <div id="stockModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Novo Item de Estoque</div>
+            
+            <div class="form-group">
+                <label class="form-label">Nome do Produto *</label>
+                <input type="text" id="stockName" class="form-input" placeholder="Ex: Caixa de Envio">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Quantidade Inicial *</label>
+                <input type="number" id="stockQuantity" class="form-input" placeholder="0" min="0">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Limite de Alerta *</label>
+                <input type="number" id="stockAlert" class="form-input" placeholder="Quantidade mínima" min="0">
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-save" onclick="saveStock()">Adicionar Item</button>
+                <button class="btn-cancel" onclick="closeModal('stockModal')">Cancelar</button>
             </div>
         </div>
     </div>
@@ -418,24 +448,21 @@
         };
 
         let firebaseReady = false;
-        let db = null;
         let fbDb = null;
 
         try {
             firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
             fbDb = firebase.database();
             firebaseReady = true;
-            console.log("✅ Firebase OK");
             loadFromFirebase();
         } catch(error) {
-            console.log("⚠️ Firebase offline");
             firebaseReady = false;
         }
 
         // Data
         let orders = JSON.parse(localStorage.getItem('olive_orders') || '[]');
         let tasks = JSON.parse(localStorage.getItem('olive_tasks') || '[]');
+        let stock = JSON.parse(localStorage.getItem('olive_stock') || '[]');
         const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
         const statuses = ['Modelagem', 'Lixamento', 'Pintura', 'Verniz 1', 'Verniz 2', 'Secando', 'Pronto'];
 
@@ -457,9 +484,14 @@
                         renderAll();
                     }
                 });
-            } catch(error) {
-                console.log("Erro ao carregar Firebase");
-            }
+                fbDb.ref('stock').on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        stock = snapshot.val();
+                        localStorage.setItem('olive_stock', JSON.stringify(stock));
+                        renderAll();
+                    }
+                });
+            } catch(error) {}
         }
 
         // Sync Firebase
@@ -468,19 +500,20 @@
             try {
                 fbDb.ref('orders').set(orders);
                 fbDb.ref('tasks').set(tasks);
+                fbDb.ref('stock').set(stock);
             } catch(error) {}
         }
 
-        // Funções UI
+        // UI
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
             document.getElementById(tab).classList.add('active');
             event.target.classList.add('active');
-            renderAll();
         }
 
-        function openOrderModal(orderId = null) {
+        function openOrderModal(id = null) {
+            document.getElementById('orderEditId').value = id || '';
             document.getElementById('orderName').value = '';
             document.getElementById('orderDate').value = '';
             document.getElementById('orderPieces').value = '';
@@ -488,19 +521,16 @@
             document.getElementById('orderFreight').value = '';
             document.getElementById('orderNotes').value = '';
             
-            if (orderId) {
-                const order = orders.find(o => o.id === orderId);
+            if (id) {
+                const order = orders.find(o => o.id === id);
                 if (order) {
                     document.getElementById('orderName').value = order.name;
                     document.getElementById('orderDate').value = order.date || '';
-                    document.getElementById('orderPieces').value = order.pieces.map(p => p.name).join(', ');
+                    document.getElementById('orderPieces').value = order.pieces.map(p => p.name).join('; ');
                     document.getElementById('orderTotal').value = order.total;
                     document.getElementById('orderFreight').value = order.freight;
                     document.getElementById('orderNotes').value = order.notes;
-                    document.getElementById('orderModal').dataset.editingId = orderId;
                 }
-            } else {
-                document.getElementById('orderModal').dataset.editingId = '';
             }
             
             document.getElementById('orderModal').classList.add('active');
@@ -511,7 +541,8 @@
         }
 
         function saveOrder() {
-            const name = document.getElementById('orderName').value;
+            const editId = document.getElementById('orderEditId').value;
+            const name = document.getElementById('orderName').value.trim();
             const date = document.getElementById('orderDate').value;
             const pieces = document.getElementById('orderPieces').value;
             const total = parseFloat(document.getElementById('orderTotal').value) || 0;
@@ -523,27 +554,25 @@
                 return;
             }
 
-            const piecesArray = pieces.split(',').map(p => ({
+            const piecesArray = pieces.split(';').map(p => ({
                 name: p.trim(),
-                status: 'Modelagem',
-                value: 0
+                status: 'Modelagem'
             })).filter(p => p.name);
 
-            const editingId = document.getElementById('orderModal').dataset.editingId;
-            
-            if (editingId) {
-                // Editar pedido existente
-                const order = orders.find(o => o.id === editingId);
-                if (order) {
-                    order.name = name;
-                    order.date = date || null;
-                    order.pieces = piecesArray;
-                    order.total = total;
-                    order.freight = freight;
-                    order.notes = notes;
+            if (editId) {
+                const idx = orders.findIndex(o => o.id === editId);
+                if (idx >= 0) {
+                    orders[idx] = {
+                        ...orders[idx],
+                        name,
+                        date: date || null,
+                        pieces: piecesArray,
+                        total,
+                        freight,
+                        notes
+                    };
                 }
             } else {
-                // Novo pedido
                 orders.push({
                     id: 'ord_' + Date.now(),
                     name,
@@ -561,10 +590,6 @@
             syncFirebase();
             closeModal('orderModal');
             renderAll();
-        }
-
-        function editOrder(id) {
-            openOrderModal(id);
         }
 
         function deleteOrder(id) {
@@ -586,15 +611,37 @@
             }
         }
 
+        function updatePieceStatus(orderId, pieceIdx, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (order && order.pieces[pieceIdx]) {
+                order.pieces[pieceIdx].status = newStatus;
+                localStorage.setItem('olive_orders', JSON.stringify(orders));
+                syncFirebase();
+                renderAll();
+            }
+        }
+
         function openTaskModal() {
             document.getElementById('taskTitle').value = '';
             document.getElementById('taskDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('taskPeriod').value = 'once';
+            document.getElementById('taskCustomDays').value = '';
+            document.getElementById('customPeriodGroup').style.display = 'none';
             document.getElementById('taskModal').classList.add('active');
         }
+
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'taskPeriod') {
+                document.getElementById('customPeriodGroup').style.display = 
+                    e.target.value === 'custom' ? 'block' : 'none';
+            }
+        });
 
         function saveTask() {
             const title = document.getElementById('taskTitle').value;
             const date = document.getElementById('taskDate').value;
+            const period = document.getElementById('taskPeriod').value;
+            const customDays = parseInt(document.getElementById('taskCustomDays').value) || 0;
 
             if (!title) {
                 alert('Escreva uma tarefa!');
@@ -605,6 +652,8 @@
                 id: 'tsk_' + Date.now(),
                 title,
                 date,
+                period,
+                customDays: period === 'custom' ? customDays : null,
                 completed: false,
                 createdAt: new Date().toISOString()
             });
@@ -630,14 +679,52 @@
             renderAll();
         }
 
-        function updatePieceStatus(orderId, pieceIdx, newStatus) {
-            const order = orders.find(o => o.id === orderId);
-            if (order && order.pieces[pieceIdx]) {
-                order.pieces[pieceIdx].status = newStatus;
-                localStorage.setItem('olive_orders', JSON.stringify(orders));
+        function openStockModal() {
+            document.getElementById('stockName').value = '';
+            document.getElementById('stockQuantity').value = '';
+            document.getElementById('stockAlert').value = '';
+            document.getElementById('stockModal').classList.add('active');
+        }
+
+        function saveStock() {
+            const name = document.getElementById('stockName').value.trim();
+            const quantity = parseInt(document.getElementById('stockQuantity').value) || 0;
+            const alert = parseInt(document.getElementById('stockAlert').value) || 0;
+
+            if (!name || quantity < 0 || alert < 0) {
+                alert('Preencha corretamente!');
+                return;
+            }
+
+            stock.push({
+                id: 'stk_' + Date.now(),
+                name,
+                quantity,
+                alert,
+                createdAt: new Date().toISOString()
+            });
+
+            localStorage.setItem('olive_stock', JSON.stringify(stock));
+            syncFirebase();
+            closeModal('stockModal');
+            renderAll();
+        }
+
+        function updateStockQuantity(id, newQty) {
+            const item = stock.find(s => s.id === id);
+            if (item) {
+                item.quantity = parseInt(newQty) || 0;
+                localStorage.setItem('olive_stock', JSON.stringify(stock));
                 syncFirebase();
                 renderAll();
             }
+        }
+
+        function deleteStock(id) {
+            stock = stock.filter(s => s.id !== id);
+            localStorage.setItem('olive_stock', JSON.stringify(stock));
+            syncFirebase();
+            renderAll();
         }
 
         // Render
@@ -647,6 +734,7 @@
             renderTarefas();
             renderCalendario();
             renderRastreador();
+            renderEstoque();
             renderConcluidos();
         }
 
@@ -674,12 +762,12 @@
                 const isLate = oDate < today && oDate.getMonth() < thisMonth;
                 return `
                     <div class="card ${isLate ? 'late' : ''}">
-                        ${isLate ? '<div class="late-badge">⚠️ ATRASADO</div>' : ''}
+                        ${isLate ? '<div style="color: #D85A30; font-weight: 600; margin-bottom: 0.5rem;">⚠️ ATRASADO</div>' : ''}
                         <div class="card-header">${o.name}</div>
                         <div class="card-info">📅 ${oDate.toLocaleDateString('pt-BR')}</div>
                         <div class="card-total">R$ ${(o.total + o.freight).toFixed(2)}</div>
                         <div class="card-actions">
-                            <button class="btn-small" onclick="editOrder('${o.id}')">✏️ Editar</button>
+                            <button class="btn-small" onclick="openOrderModal('${o.id}')">✏️ Editar</button>
                             <button class="btn-small success" onclick="updateOrderStatus('${o.id}')">✅ Concluir</button>
                         </div>
                     </div>
@@ -713,7 +801,7 @@
                         `).join('')}
                     </div>
                     <div class="card-actions">
-                        <button class="btn-small" onclick="editOrder('${o.id}')">✏️ Editar</button>
+                        <button class="btn-small" onclick="openOrderModal('${o.id}')">✏️ Editar</button>
                         <button class="btn-small danger" onclick="deleteOrder('${o.id}')">🗑️ Deletar</button>
                     </div>
                 </div>
@@ -727,13 +815,21 @@
                 return;
             }
 
+            const periodLabels = {
+                'once': 'Uma vez',
+                'daily': '🔄 Diária',
+                'weekly': '🔄 Semanal',
+                'monthly': '🔄 Mensal',
+                'custom': '🔄 Customizada'
+            };
+
             container.innerHTML = tasks.map(t => `
                 <div class="card" style="${t.completed ? 'opacity: 0.6;' : ''}">
                     <div class="card-header" style="${t.completed ? 'text-decoration: line-through;' : ''}">
                         <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask('${t.id}')" style="margin-right: 0.5rem;">
                         ${t.title}
                     </div>
-                    <div class="card-info">📅 ${new Date(t.date).toLocaleDateString('pt-BR')}</div>
+                    <div class="card-info">📅 ${new Date(t.date).toLocaleDateString('pt-BR')} | ${periodLabels[t.period]} ${t.customDays ? '(' + t.customDays + 'd)' : ''}</div>
                     <div class="card-actions">
                         <button class="btn-small danger" onclick="deleteTask('${t.id}')">🗑️ Deletar</button>
                     </div>
@@ -750,13 +846,12 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
             let html = `<h3 style="margin-bottom: 1rem; color: #D85A30;">${months[month]} ${year}</h3>`;
-            html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 1rem;">';
+            html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;">';
             
             for (let i = 0; i < firstDay; i++) html += '<div></div>';
-            
             for (let d = 1; d <= daysInMonth; d++) {
                 const isToday = d === today.getDate();
-                html += `<div class="calendar-day ${isToday ? 'today' : ''}" style="cursor: default;">${d}</div>`;
+                html += `<div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #e0e0e0; border-radius: 4px; ${isToday ? 'background: #E6F7E6; color: #080; font-weight: 600;' : ''}">${d}</div>`;
             }
             
             html += '</div>';
@@ -789,6 +884,29 @@
             });
 
             container.innerHTML = html || '<div class="empty-state">Todas as peças prontas! 🎉</div>';
+        }
+
+        function renderEstoque() {
+            const container = document.getElementById('estoque-content');
+            if (stock.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum item de estoque</div>';
+                return;
+            }
+
+            container.innerHTML = stock.map(s => {
+                const isLow = s.quantity <= s.alert;
+                return `
+                    <div class="card ${isLow ? 'alert' : ''}">
+                        ${isLow ? '<div style="color: #FF6B00; font-weight: 600; margin-bottom: 0.5rem;">⚠️ ESTOQUE BAIXO</div>' : ''}
+                        <div class="card-header">${s.name}</div>
+                        <div class="card-info">Quantidade: ${s.quantity} | Alerta: ${s.alert}</div>
+                        <div style="display: flex; gap: 8px; margin-top: 0.75rem;">
+                            <input type="number" value="${s.quantity}" min="0" style="flex: 1; padding: 6px; border: 1px solid #e0e0e0; border-radius: 4px;" onchange="updateStockQuantity('${s.id}', this.value)">
+                            <button class="btn-small danger" onclick="deleteStock('${s.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function renderConcluidos() {
