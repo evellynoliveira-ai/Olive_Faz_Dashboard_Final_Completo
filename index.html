@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Olive Faz - Dashboard Completo</title>
+    <title>🐞 Olive Faz - Dashboard</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -14,44 +14,41 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #8B5A9F 0%, #6B3A7D 100%);
+            background: linear-gradient(135deg, #D85A30 0%, #C74A1F 100%);
             color: white;
             padding: 1.5rem;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        .header h1 { font-size: 24px; margin-bottom: 0.5rem; }
-        .header p { font-size: 13px; opacity: 0.9; }
+        .header h1 { font-size: 24px; margin-bottom: 0.3rem; }
+        .header p { font-size: 12px; opacity: 0.9; }
         
         .tabs {
             display: flex;
-            gap: 0.5rem;
-            padding: 1rem;
+            gap: 0;
             background: white;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 2px solid #e0e0e0;
             overflow-x: auto;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            padding: 0 1rem;
         }
         
         .tab-btn {
-            padding: 10px 16px;
+            flex: 1;
+            padding: 12px 16px;
             border: none;
             background: transparent;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             color: #888;
-            border-bottom: 2px solid transparent;
-            white-space: nowrap;
+            border-bottom: 3px solid transparent;
             transition: all 0.2s;
+            white-space: nowrap;
         }
         
         .tab-btn.active {
-            color: #8B5A9F;
-            border-bottom-color: #8B5A9F;
-            font-weight: 500;
+            color: #D85A30;
+            border-bottom-color: #D85A30;
+            font-weight: 600;
         }
         
         .container {
@@ -64,111 +61,58 @@
         .tab-content.active { display: block; }
         
         .btn-primary {
-            background: #8B5A9F;
+            background: #D85A30;
             color: white;
             border: none;
             padding: 10px 16px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 1rem;
-            transition: background 0.2s;
-        }
-        
-        .btn-primary:hover { background: #6B3A7D; }
-        
-        /* PEDIDOS */
-        .month-section {
-            margin-bottom: 2rem;
-        }
-        
-        .month-title {
-            font-size: 16px;
             font-weight: 500;
-            color: #8B5A9F;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #8B5A9F;
         }
         
-        .orders-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
+        .btn-primary:hover { background: #C74A1F; }
         
-        .order-card {
+        .card {
             background: white;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 1rem;
+            margin-bottom: 1rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            cursor: pointer;
-            transition: all 0.2s;
         }
         
-        .order-card:hover {
-            border-color: #8B5A9F;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .card.late {
+            border-left: 4px solid #D85A30;
+            background: #FFF5F0;
         }
         
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 0.75rem;
-        }
-        
-        .order-name {
-            font-weight: 500;
+        .card-header {
+            font-weight: 600;
             font-size: 15px;
+            margin-bottom: 0.5rem;
             color: #333;
         }
         
-        .order-date {
+        .card-info {
             font-size: 12px;
             color: #888;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
         
-        .order-total {
+        .card-total {
             font-size: 14px;
-            font-weight: 500;
-            color: #8B5A9F;
-            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #D85A30;
+            margin: 0.5rem 0;
         }
         
-        .order-pieces {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 0.5rem;
-        }
-        
-        .order-status {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 0.75rem;
-        }
-        
-        .status-badge {
-            font-size: 10px;
-            padding: 3px 6px;
-            border-radius: 3px;
-            background: #f0f0f0;
-            color: #666;
-        }
-        
-        .status-completed { background: #D4EDDA; color: #155724; }
-        .status-sent { background: #CCE5FF; color: #004085; }
-        
-        .order-actions {
+        .card-actions {
             display: flex;
             gap: 6px;
             margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid #f0f0f0;
+            flex-wrap: wrap;
         }
         
         .btn-small {
@@ -179,14 +123,13 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            min-width: 70px;
         }
         
         .btn-small:hover { background: #e0e0e0; }
+        .btn-small.danger { background: #FFE6E6; color: #C00; }
+        .btn-small.success { background: #E6F7E6; color: #080; }
         
-        .btn-delete { background: #FFE6E6; color: #C00; }
-        .btn-delete:hover { background: #FFCCCC; }
-        
-        /* MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -204,18 +147,18 @@
         .modal-content {
             background: white;
             border-radius: 8px;
-            padding: 2rem;
-            max-width: 600px;
+            padding: 1.5rem;
+            max-width: 500px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
         }
         
         .modal-header {
-            font-size: 18px;
-            font-weight: 500;
+            font-size: 16px;
+            font-weight: 600;
             margin-bottom: 1rem;
-            padding-bottom: 1rem;
+            padding-bottom: 0.75rem;
             border-bottom: 1px solid #e0e0e0;
         }
         
@@ -224,8 +167,8 @@
         }
         
         .form-label {
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 12px;
+            font-weight: 600;
             color: #666;
             margin-bottom: 4px;
             display: block;
@@ -237,77 +180,13 @@
             border: 1px solid #e0e0e0;
             border-radius: 4px;
             font-size: 13px;
-            font-family: inherit;
         }
         
         .form-input:focus {
             outline: none;
-            border-color: #8B5A9F;
-            box-shadow: 0 0 0 2px rgba(139, 90, 159, 0.1);
+            border-color: #D85A30;
+            box-shadow: 0 0 0 2px rgba(216,90,48,0.1);
         }
-        
-        .pieces-list {
-            background: #f9f9f9;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .piece-item {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            padding: 0.75rem;
-            margin-bottom: 0.75rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .piece-info {
-            flex: 1;
-        }
-        
-        .piece-name { font-weight: 500; font-size: 13px; margin-bottom: 4px; }
-        .piece-details { font-size: 11px; color: #888; }
-        
-        .piece-status {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            margin-top: 4px;
-        }
-        
-        .status-select {
-            padding: 4px 8px;
-            font-size: 11px;
-            border: 1px solid #e0e0e0;
-            border-radius: 3px;
-        }
-        
-        .btn-remove-piece {
-            background: #FFE6E6;
-            color: #C00;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-        
-        .add-piece-btn {
-            background: #f0f0f0;
-            border: 1px dashed #ccc;
-            padding: 0.75rem;
-            border-radius: 4px;
-            cursor: pointer;
-            text-align: center;
-            font-size: 13px;
-            color: #666;
-        }
-        
-        .add-piece-btn:hover { background: #e8e8e8; }
         
         .modal-actions {
             display: flex;
@@ -319,15 +198,16 @@
         
         .modal-actions button {
             flex: 1;
-            padding: 10px 16px;
+            padding: 10px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
         }
         
         .btn-save {
-            background: #8B5A9F;
+            background: #D85A30;
             color: white;
         }
         
@@ -336,229 +216,193 @@
             color: #666;
         }
         
-        /* CALENDÁRIO */
-        .calendar-grid {
+        .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .weekday-header {
-            text-align: center;
-            font-weight: 500;
-            font-size: 13px;
-            color: #888;
-            padding: 8px 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .calendar-day {
-            background: #f9f9f9;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            min-height: 100px;
-            padding: 6px;
-            overflow-y: auto;
-        }
-        
-        .calendar-day-number {
-            font-weight: 500;
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 4px;
-            padding-bottom: 4px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .calendar-order {
-            font-size: 10px;
-            padding: 3px 6px;
-            margin-bottom: 3px;
-            border-radius: 3px;
-            background: #D85A30;
-            color: white;
-            cursor: pointer;
-        }
-        
-        /* TAREFAS DO DIA */
-        .today-date {
-            font-size: 14px;
-            color: #666;
+            gap: 4px;
             margin-bottom: 1rem;
         }
         
-        .tasks-list {
+        .calendar-day {
+            aspect-ratio: 1;
             background: white;
             border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            cursor: pointer;
         }
         
-        .task-item {
-            padding: 1rem;
-            border-bottom: 1px solid #f0f0f0;
+        .calendar-day:hover { background: #f5f5f5; }
+        .calendar-day.today { background: #E6F7E6; color: #080; font-weight: 600; }
+        
+        .pieces-list {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+        }
+        
+        .piece-item {
+            background: #f9f9f9;
+            padding: 0.5rem;
+            border-radius: 3px;
+            margin-bottom: 0.4rem;
             display: flex;
             justify-content: space-between;
-            align-items: start;
-            gap: 1rem;
+            align-items: center;
         }
         
-        .task-item:last-child { border-bottom: none; }
-        
-        .task-info {
-            flex: 1;
+        .status-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            background: #E6F0FF;
+            color: #0066CC;
+            border-radius: 3px;
         }
         
-        .task-title {
-            font-weight: 500;
-            font-size: 14px;
-            margin-bottom: 4px;
+        .late-badge {
+            background: #FFE6E6;
+            color: #C00;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
         }
         
-        .task-details {
-            font-size: 12px;
+        .empty-state {
             color: #888;
+            text-align: center;
+            padding: 2rem;
         }
         
-        .task-actions {
-            display: flex;
-            gap: 6px;
-        }
-        
-        .checkbox-custom {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            accent-color: #8B5A9F;
-        }
-        
-        /* RESPONSIVE */
         @media (max-width: 600px) {
             .header h1 { font-size: 20px; }
-            .container { padding: 0.5rem; }
-            .tabs { padding: 0.75rem 0.5rem; }
-            .orders-grid { grid-template-columns: 1fr; }
-            .calendar-grid { grid-template-columns: repeat(7, 1fr); gap: 2px; }
-            .calendar-day { min-height: 60px; padding: 3px; }
-            .modal-content { padding: 1rem; }
+            .tab-btn { font-size: 12px; padding: 10px 8px; }
+            .card-actions { flex-direction: column; }
+            .btn-small { width: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🌿 Olive Faz</h1>
-        <p>Dashboard integrado completo</p>
+        <h1>🐞 Olive Faz</h1>
+        <p>Dashboard de Gestão</p>
     </div>
     
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('pedidos')">📋 Pedidos</button>
+        <button class="tab-btn active" onclick="switchTab('proximos')">🚀 Próximos</button>
+        <button class="tab-btn" onclick="switchTab('pedidos')">📋 Pedidos</button>
+        <button class="tab-btn" onclick="switchTab('tarefas')">✓ Tarefas</button>
         <button class="tab-btn" onclick="switchTab('calendario')">📅 Calendário</button>
-        <button class="tab-btn" onclick="switchTab('tarefas')">✓ Tarefas do Dia</button>
         <button class="tab-btn" onclick="switchTab('rastreador')">🎨 Rastreador</button>
+        <button class="tab-btn" onclick="switchTab('concluidos')">✅ Concluídos</button>
     </div>
     
     <div class="container">
-        <!-- ABA PEDIDOS -->
-        <div id="pedidos" class="tab-content active">
-            <button class="btn-primary" onclick="openAddOrderModal()">+ Novo Pedido</button>
-            <div id="orders-container"></div>
+        <!-- PRÓXIMOS -->
+        <div id="proximos" class="tab-content active">
+            <div id="proximos-content"></div>
         </div>
         
-        <!-- ABA CALENDÁRIO -->
-        <div id="calendario" class="tab-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2 id="cal-title" style="font-size: 18px;"></h2>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn-primary" style="margin: 0;" onclick="prevMonth()">← Anterior</button>
-                    <button class="btn-primary" style="margin: 0;" onclick="nextMonth()">Próximo →</button>
-                </div>
-            </div>
-            <div class="calendar-grid" id="calendar-grid"></div>
+        <!-- PEDIDOS -->
+        <div id="pedidos" class="tab-content">
+            <button class="btn-primary" onclick="openOrderModal()">+ Novo Pedido</button>
+            <div id="pedidos-content"></div>
         </div>
         
-        <!-- ABA TAREFAS DO DIA -->
+        <!-- TAREFAS -->
         <div id="tarefas" class="tab-content">
-            <div class="today-date" id="today-info"></div>
-            <div class="tasks-list" id="tasks-container"></div>
+            <button class="btn-primary" onclick="openTaskModal()">+ Nova Tarefa</button>
+            <div id="tarefas-content"></div>
         </div>
         
-        <!-- ABA RASTREADOR (simplificada) -->
+        <!-- CALENDÁRIO -->
+        <div id="calendario" class="tab-content">
+            <div id="calendario-content"></div>
+        </div>
+        
+        <!-- RASTREADOR -->
         <div id="rastreador" class="tab-content">
-            <p style="color: #888; margin-bottom: 1rem;">Rastreador de produção - Em desenvolvimento</p>
-            <button class="btn-primary" onclick="alert('Funcionalidade em desenvolvimento')">Adicionar Peça</button>
+            <div id="rastreador-content"></div>
+        </div>
+        
+        <!-- CONCLUÍDOS -->
+        <div id="concluidos" class="tab-content">
+            <div id="concluidos-content"></div>
         </div>
     </div>
     
     <!-- MODAL NOVO PEDIDO -->
     <div id="orderModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <span id="modalTitle">Novo Pedido</span>
-                <button style="float: right; background: none; border: none; font-size: 20px; cursor: pointer;" onclick="closeModal()">×</button>
-            </div>
+            <div class="modal-header">Novo Pedido</div>
             
             <div class="form-group">
                 <label class="form-label">Nome da Cliente *</label>
-                <input type="text" id="orderName" class="form-input" placeholder="Maria">
+                <input type="text" id="orderName" class="form-input" placeholder="Rafa">
             </div>
             
             <div class="form-group">
-                <label class="form-label">Mês *</label>
-                <select id="orderMonth" class="form-input">
-                    <option value="01">Janeiro</option>
-                    <option value="02">Fevereiro</option>
-                    <option value="03">Março</option>
-                    <option value="04">Abril</option>
-                    <option value="05">Maio</option>
-                    <option value="06">Junho</option>
-                    <option value="07">Julho</option>
-                    <option value="08">Agosto</option>
-                    <option value="09">Setembro</option>
-                    <option value="10">Outubro</option>
-                    <option value="11">Novembro</option>
-                    <option value="12">Dezembro</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Data de Envio *</label>
+                <label class="form-label">Data de Envio</label>
                 <input type="date" id="orderDate" class="form-input">
             </div>
             
             <div class="form-group">
+                <label class="form-label">Descrição das Peças *</label>
+                <textarea id="orderPieces" class="form-input" placeholder="Joaninha verde, Espelho 20cm" style="min-height: 60px;"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Valor Total (R$)</label>
+                <input type="number" id="orderTotal" class="form-input" step="0.01" placeholder="0.00">
+            </div>
+            
+            <div class="form-group">
                 <label class="form-label">Frete (R$)</label>
-                <input type="number" id="orderShipping" class="form-input" placeholder="0.00" step="0.01">
+                <input type="number" id="orderFreight" class="form-input" step="0.01" placeholder="0.00">
             </div>
             
             <div class="form-group">
                 <label class="form-label">Observações</label>
-                <textarea id="orderNotes" class="form-input" placeholder="Observações adicionais..." style="min-height: 60px;"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Imagem (opcional)</label>
-                <input type="file" id="orderImage" class="form-input" accept="image/*">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Peças *</label>
-                <div class="pieces-list" id="piecesList"></div>
-                <div class="add-piece-btn" onclick="addNewPiece()">+ Adicionar Peça</div>
+                <textarea id="orderNotes" class="form-input" style="min-height: 60px;"></textarea>
             </div>
             
             <div class="modal-actions">
-                <button class="modal-actions button btn-save" onclick="saveOrder()">Salvar Pedido</button>
-                <button class="modal-actions button btn-cancel" onclick="closeModal()">Cancelar</button>
+                <button class="btn-save" onclick="saveOrder()">Criar Pedido</button>
+                <button class="btn-cancel" onclick="closeModal('orderModal')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL NOVA TAREFA -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Nova Tarefa</div>
+            
+            <div class="form-group">
+                <label class="form-label">Tarefa *</label>
+                <textarea id="taskTitle" class="form-input" placeholder="O que você precisa fazer?" style="min-height: 60px;"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Data</label>
+                <input type="date" id="taskDate" class="form-input">
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-save" onclick="saveTask()">Criar Tarefa</button>
+                <button class="btn-cancel" onclick="closeModal('taskModal')">Cancelar</button>
             </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js"></script>
 
     <script>
         // Firebase Config
@@ -570,349 +414,365 @@
 
         let firebaseReady = false;
         let db = null;
+        let fbDb = null;
 
         try {
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
+            fbDb = firebase.database();
             firebaseReady = true;
             console.log("✅ Firebase OK");
+            loadFromFirebase();
         } catch(error) {
+            console.log("⚠️ Firebase offline");
             firebaseReady = false;
         }
 
-        function syncToFirebase(type) {
-            if (!firebaseReady || !db) return;
+        // Data
+        let orders = JSON.parse(localStorage.getItem('olive_orders') || '[]');
+        let tasks = JSON.parse(localStorage.getItem('olive_tasks') || '[]');
+        const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const statuses = ['Modelagem', 'Lixamento', 'Pintura', 'Verniz 1', 'Verniz 2', 'Secando', 'Pronto'];
+
+        // Load Firebase
+        function loadFromFirebase() {
+            if (!firebaseReady) return;
             try {
-                if (type === 'orders') {
-                    db.collection("orders").doc("data").set({items: orders, updatedAt: new Date()}).catch(e => {});
-                }
+                fbDb.ref('orders').on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        orders = snapshot.val();
+                        localStorage.setItem('olive_orders', JSON.stringify(orders));
+                        renderAll();
+                    }
+                });
+                fbDb.ref('tasks').on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        tasks = snapshot.val();
+                        localStorage.setItem('olive_tasks', JSON.stringify(tasks));
+                        renderAll();
+                    }
+                });
+            } catch(error) {
+                console.log("Erro ao carregar Firebase");
+            }
+        }
+
+        // Sync Firebase
+        function syncFirebase() {
+            if (!firebaseReady) return;
+            try {
+                fbDb.ref('orders').set(orders);
+                fbDb.ref('tasks').set(tasks);
             } catch(error) {}
         }
 
-        const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-        
-        let orders = JSON.parse(localStorage.getItem('olive_orders') || '[]');
-        let tasks = JSON.parse(localStorage.getItem('olive_tasks') || '[]');
-        let currentEditingOrderId = null;
-        let currentMonth = new Date();
-        let newPieces = [];
-
+        // Funções UI
         function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
             document.getElementById(tab).classList.add('active');
             event.target.classList.add('active');
-            
-            if (tab === 'calendario') renderCalendar();
-            if (tab === 'tarefas') renderTodayTasks();
+            renderAll();
         }
 
-        function openAddOrderModal() {
-            currentEditingOrderId = null;
-            newPieces = [];
-            document.getElementById('modalTitle').textContent = 'Novo Pedido';
+        function openOrderModal() {
             document.getElementById('orderName').value = '';
-            document.getElementById('orderMonth').value = '01';
             document.getElementById('orderDate').value = '';
-            document.getElementById('orderShipping').value = '';
+            document.getElementById('orderPieces').value = '';
+            document.getElementById('orderTotal').value = '';
+            document.getElementById('orderFreight').value = '';
             document.getElementById('orderNotes').value = '';
-            document.getElementById('orderImage').value = '';
-            document.getElementById('piecesList').innerHTML = '';
             document.getElementById('orderModal').classList.add('active');
-            addNewPiece();
         }
 
-        function closeModal() {
-            document.getElementById('orderModal').classList.remove('active');
-        }
-
-        function addNewPiece() {
-            const pieceId = 'piece_' + Date.now();
-            newPieces.push({ id: pieceId, name: '', value: 0, status: 'Modelagem' });
-            renderPieces();
-        }
-
-        function renderPieces() {
-            const list = document.getElementById('piecesList');
-            list.innerHTML = newPieces.map((piece, idx) => `
-                <div class="piece-item">
-                    <div class="piece-info">
-                        <input type="text" class="form-input" style="margin-bottom: 4px;" placeholder="Nome da peça" 
-                               value="${piece.name}" onchange="newPieces[${idx}].name = this.value">
-                        <div class="piece-details">
-                            <div style="margin-bottom: 4px;">
-                                <label style="font-size: 11px;">Valor (R$):</label>
-                                <input type="number" class="form-input" style="width: 80px; padding: 4px;" 
-                                       placeholder="0.00" value="${piece.value}" step="0.01" 
-                                       onchange="newPieces[${idx}].value = parseFloat(this.value)">
-                            </div>
-                            <div>
-                                <label style="font-size: 11px;">Status:</label>
-                                <select class="status-select" onchange="newPieces[${idx}].status = this.value">
-                                    <option value="Modelagem" ${piece.status === 'Modelagem' ? 'selected' : ''}>Modelagem</option>
-                                    <option value="Lixamento" ${piece.status === 'Lixamento' ? 'selected' : ''}>Lixamento</option>
-                                    <option value="Pintura" ${piece.status === 'Pintura' ? 'selected' : ''}>Pintura</option>
-                                    <option value="Verniz" ${piece.status === 'Verniz' ? 'selected' : ''}>Verniz</option>
-                                    <option value="Finalizado" ${piece.status === 'Finalizado' ? 'selected' : ''}>Finalizado</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-remove-piece" onclick="newPieces.splice(${idx}, 1); renderPieces();">✕</button>
-                </div>
-            `).join('');
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
         }
 
         function saveOrder() {
             const name = document.getElementById('orderName').value;
-            const month = document.getElementById('orderMonth').value;
             const date = document.getElementById('orderDate').value;
-            const shipping = parseFloat(document.getElementById('orderShipping').value) || 0;
+            const pieces = document.getElementById('orderPieces').value;
+            const total = parseFloat(document.getElementById('orderTotal').value) || 0;
+            const freight = parseFloat(document.getElementById('orderFreight').value) || 0;
             const notes = document.getElementById('orderNotes').value;
-            const image = document.getElementById('orderImage').files[0];
 
-            if (!name || !date || newPieces.length === 0 || newPieces.some(p => !p.name)) {
-                alert('Preencha todos os campos obrigatórios!');
+            if (!name || !pieces) {
+                alert('Preencha nome e peças!');
                 return;
             }
 
-            const total = newPieces.reduce((sum, p) => sum + p.value, 0) + shipping;
-            
-            const order = {
-                id: currentEditingOrderId || 'order_' + Date.now(),
+            const piecesArray = pieces.split(',').map(p => ({
+                name: p.trim(),
+                status: 'Modelagem',
+                value: 0
+            })).filter(p => p.name);
+
+            orders.push({
+                id: 'ord_' + Date.now(),
                 name,
-                month,
-                date,
-                shipping,
-                notes,
-                pieces: newPieces,
+                date: date || null,
+                pieces: piecesArray,
                 total,
-                image: image ? URL.createObjectURL(image) : null,
-                status: 'pending'
-            };
-
-            if (currentEditingOrderId) {
-                const idx = orders.findIndex(o => o.id === currentEditingOrderId);
-                if (idx >= 0) orders[idx] = order;
-            } else {
-                orders.push(order);
-            }
-
-            localStorage.setItem('olive_orders', JSON.stringify(orders));
-            syncToFirebase('orders');
-            closeModal();
-            renderOrders();
-            renderCalendar();
-            generateTodayTasks();
-        }
-
-        function renderOrders() {
-            const container = document.getElementById('orders-container');
-            const ordersByMonth = {};
-            
-            orders.forEach(order => {
-                const monthIndex = parseInt(order.month) - 1;
-                const monthName = months[monthIndex];
-                if (!ordersByMonth[monthName]) ordersByMonth[monthName] = [];
-                ordersByMonth[monthName].push(order);
+                freight,
+                notes,
+                status: 'pending',
+                createdAt: new Date().toISOString()
             });
 
-            container.innerHTML = Object.entries(ordersByMonth).map(([month, monthOrders]) => `
-                <div class="month-section">
-                    <div class="month-title">${month}</div>
-                    <div class="orders-grid">
-                        ${monthOrders.map(order => `
-                            <div class="order-card">
-                                ${order.image ? `<img src="${order.image}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 0.75rem;">` : ''}
-                                <div class="order-header">
-                                    <div class="order-name">${order.name}</div>
-                                </div>
-                                <div class="order-date">📅 ${new Date(order.date).toLocaleDateString('pt-BR')}</div>
-                                <div class="order-total">Total: R$ ${order.total.toFixed(2)}</div>
-                                <div class="order-pieces">
-                                    ${order.pieces.length} peça${order.pieces.length > 1 ? 's' : ''}
-                                    ${order.pieces.map(p => `<div style="font-size: 11px; margin: 2px 0;">${p.name} - R$ ${p.value.toFixed(2)}</div>`).join('')}
-                                </div>
-                                <div class="order-status">
-                                    ${order.pieces.map(p => `<div class="status-badge status-${p.status.toLowerCase()}">${p.status}</div>`).join('')}
-                                </div>
-                                <div class="order-actions">
-                                    <button class="btn-small" onclick="editOrder('${order.id}')">Editar</button>
-                                    <button class="btn-small" onclick="toggleOrderStatus('${order.id}')">Enviado</button>
-                                    <button class="btn-small btn-delete" onclick="deleteOrder('${order.id}')">Deletar</button>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function editOrder(id) {
-            const order = orders.find(o => o.id === id);
-            if (!order) return;
-            
-            currentEditingOrderId = id;
-            newPieces = [...order.pieces];
-            
-            document.getElementById('modalTitle').textContent = 'Editar Pedido';
-            document.getElementById('orderName').value = order.name;
-            document.getElementById('orderMonth').value = order.month;
-            document.getElementById('orderDate').value = order.date;
-            document.getElementById('orderShipping').value = order.shipping;
-            document.getElementById('orderNotes').value = order.notes;
-            renderPieces();
-            document.getElementById('orderModal').classList.add('active');
+            localStorage.setItem('olive_orders', JSON.stringify(orders));
+            syncFirebase();
+            closeModal('orderModal');
+            renderAll();
         }
 
         function deleteOrder(id) {
-            if (confirm('Tem certeza?')) {
+            if (confirm('Deletar pedido?')) {
                 orders = orders.filter(o => o.id !== id);
                 localStorage.setItem('olive_orders', JSON.stringify(orders));
-                syncToFirebase('orders');
-                renderOrders();
-                renderCalendar();
+                syncFirebase();
+                renderAll();
             }
         }
 
-        function toggleOrderStatus(id) {
+        function updateOrderStatus(id) {
             const order = orders.find(o => o.id === id);
             if (order) {
-                order.status = order.status === 'pending' ? 'sent' : 'pending';
+                order.status = order.status === 'pending' ? 'completed' : 'pending';
                 localStorage.setItem('olive_orders', JSON.stringify(orders));
-                syncToFirebase('orders');
-                renderOrders();
+                syncFirebase();
+                renderAll();
             }
         }
 
-        function renderCalendar() {
-            const year = currentMonth.getFullYear();
-            const month = currentMonth.getMonth();
-            
-            document.getElementById('cal-title').textContent = `${months[month]} ${year}`;
-            
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const daysInPrevMonth = new Date(year, month, 0).getDate();
-            
-            let html = '';
-            
-            const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
-            weekdays.forEach(day => {
-                html += `<div class="weekday-header">${day}</div>`;
-            });
-            
-            for (let i = firstDay - 1; i >= 0; i--) {
-                html += `<div class="calendar-day" style="opacity: 0.5;"><div class="calendar-day-number">${daysInPrevMonth - i}</div></div>`;
-            }
-            
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayOrders = orders.filter(o => o.date === dateStr);
-                
-                html += `<div class="calendar-day">
-                    <div class="calendar-day-number">${day}</div>
-                    ${dayOrders.map(order => `
-                        <div class="calendar-order" title="Peças: ${order.pieces.map(p => p.name).join(', ')}">${order.name}</div>
-                    `).join('')}
-                </div>`;
-            }
-            
-            const totalCells = firstDay + daysInMonth;
-            const remainingCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
-            for (let i = 1; i <= remainingCells; i++) {
-                html += `<div class="calendar-day" style="opacity: 0.5;"><div class="calendar-day-number">${i}</div></div>`;
-            }
-            
-            document.getElementById('calendar-grid').innerHTML = html;
+        function openTaskModal() {
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('taskModal').classList.add('active');
         }
 
-        function prevMonth() {
-            currentMonth.setMonth(currentMonth.getMonth() - 1);
-            renderCalendar();
-        }
+        function saveTask() {
+            const title = document.getElementById('taskTitle').value;
+            const date = document.getElementById('taskDate').value;
 
-        function nextMonth() {
-            currentMonth.setMonth(currentMonth.getMonth() + 1);
-            renderCalendar();
-        }
-
-        function generateTodayTasks() {
-            const today = new Date();
-            const dayOfWeek = today.getDay();
-            
-            // Tarefas por dia da semana (você pode customizar)
-            const weeklyTasks = {
-                1: ['Modelar peças'],
-                2: ['Cadastro NFe'],
-                3: ['Modelar peças'],
-                4: ['Embalar e enviar'],
-                5: ['Criação de conteúdo'],
-                6: [],
-                0: []
-            };
-            
-            const baseTasks = weeklyTasks[dayOfWeek] || [];
-            
-            // Adicionar tarefas de pedidos do dia
-            const todayStr = today.toISOString().split('T')[0];
-            const todayOrders = orders.filter(o => o.date === todayStr);
-            
-            tasks = baseTasks.map(t => ({
-                id: 'task_' + Date.now() + Math.random(),
-                title: t,
-                completed: false,
-                date: todayStr
-            }));
-            
-            todayOrders.forEach(order => {
-                tasks.push({
-                    id: 'task_' + Date.now() + Math.random(),
-                    title: `Enviar - ${order.name}`,
-                    completed: false,
-                    date: todayStr
-                });
-            });
-            
-            localStorage.setItem('olive_tasks', JSON.stringify(tasks));
-        }
-
-        function renderTodayTasks() {
-            const today = new Date();
-            document.getElementById('today-info').textContent = `Tarefas de ${today.toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long'})}`;
-            
-            const container = document.getElementById('tasks-container');
-            if (tasks.length === 0) {
-                container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #888;">Nenhuma tarefa para hoje!</div>';
+            if (!title) {
+                alert('Escreva uma tarefa!');
                 return;
             }
-            
-            container.innerHTML = tasks.map((task, idx) => `
-                <div class="task-item">
-                    <input type="checkbox" class="checkbox-custom" ${task.completed ? 'checked' : ''} onchange="toggleTask(${idx})">
-                    <div class="task-info">
-                        <div class="task-title" style="${task.completed ? 'text-decoration: line-through; color: #ccc;' : ''}">${task.title}</div>
+
+            tasks.push({
+                id: 'tsk_' + Date.now(),
+                title,
+                date,
+                completed: false,
+                createdAt: new Date().toISOString()
+            });
+
+            localStorage.setItem('olive_tasks', JSON.stringify(tasks));
+            syncFirebase();
+            closeModal('taskModal');
+            renderAll();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            localStorage.setItem('olive_tasks', JSON.stringify(tasks));
+            syncFirebase();
+            renderAll();
+        }
+
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) task.completed = !task.completed;
+            localStorage.setItem('olive_tasks', JSON.stringify(tasks));
+            syncFirebase();
+            renderAll();
+        }
+
+        function updatePieceStatus(orderId, pieceIdx, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (order && order.pieces[pieceIdx]) {
+                order.pieces[pieceIdx].status = newStatus;
+                localStorage.setItem('olive_orders', JSON.stringify(orders));
+                syncFirebase();
+                renderAll();
+            }
+        }
+
+        // Render
+        function renderAll() {
+            renderProximos();
+            renderPedidos();
+            renderTarefas();
+            renderCalendario();
+            renderRastreador();
+            renderConcluidos();
+        }
+
+        function renderProximos() {
+            const container = document.getElementById('proximos-content');
+            const today = new Date();
+            const thisMonth = today.getMonth();
+            const thisYear = today.getFullYear();
+
+            const proximos = orders.filter(o => {
+                if (o.status === 'completed') return false;
+                if (!o.date) return false;
+                const oDate = new Date(o.date);
+                return (oDate.getMonth() === thisMonth && oDate.getFullYear() === thisYear) ||
+                       (oDate < today && oDate.getMonth() < thisMonth);
+            });
+
+            if (proximos.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum pedido próximo</div>';
+                return;
+            }
+
+            container.innerHTML = proximos.map(o => {
+                const oDate = new Date(o.date);
+                const isLate = oDate < today && oDate.getMonth() < thisMonth;
+                return `
+                    <div class="card ${isLate ? 'late' : ''}">
+                        ${isLate ? '<div class="late-badge">⚠️ ATRASADO</div>' : ''}
+                        <div class="card-header">${o.name}</div>
+                        <div class="card-info">📅 ${oDate.toLocaleDateString('pt-BR')}</div>
+                        <div class="card-total">R$ ${(o.total + o.freight).toFixed(2)}</div>
+                        <div class="card-actions">
+                            <button class="btn-small" onclick="editOrder('${o.id}')">✏️ Editar</button>
+                            <button class="btn-small success" onclick="updateOrderStatus('${o.id}')">✅ Concluir</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPedidos() {
+            const container = document.getElementById('pedidos-content');
+            const pending = orders.filter(o => o.status !== 'completed');
+
+            if (pending.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum pedido em aberto</div>';
+                return;
+            }
+
+            container.innerHTML = pending.map(o => `
+                <div class="card">
+                    <div class="card-header">${o.name}</div>
+                    <div class="card-info">📅 ${o.date ? new Date(o.date).toLocaleDateString('pt-BR') : 'SEM DATA'}</div>
+                    <div class="card-total">R$ ${(o.total + o.freight).toFixed(2)}</div>
+                    <div class="pieces-list">
+                        <strong>Peças:</strong>
+                        ${o.pieces.map((p, i) => `
+                            <div class="piece-item">
+                                <span>${p.name}</span>
+                                <select style="font-size: 11px;" onchange="updatePieceStatus('${o.id}', ${i}, this.value)">
+                                    ${statuses.map(s => `<option ${p.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                                </select>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-small" onclick="editOrder('${o.id}')">✏️ Editar</button>
+                        <button class="btn-small danger" onclick="deleteOrder('${o.id}')">🗑️ Deletar</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function toggleTask(idx) {
-            tasks[idx].completed = !tasks[idx].completed;
-            localStorage.setItem('olive_tasks', JSON.stringify(tasks));
-            renderTodayTasks();
+        function renderTarefas() {
+            const container = document.getElementById('tarefas-content');
+            if (tasks.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhuma tarefa</div>';
+                return;
+            }
+
+            container.innerHTML = tasks.map(t => `
+                <div class="card" style="${t.completed ? 'opacity: 0.6;' : ''}">
+                    <div class="card-header" style="${t.completed ? 'text-decoration: line-through;' : ''}">
+                        <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask('${t.id}')" style="margin-right: 0.5rem;">
+                        ${t.title}
+                    </div>
+                    <div class="card-info">📅 ${new Date(t.date).toLocaleDateString('pt-BR')}</div>
+                    <div class="card-actions">
+                        <button class="btn-small danger" onclick="deleteTask('${t.id}')">🗑️ Deletar</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Initialize
-        const today = new Date();
-        document.getElementById('orderMonth').value = String(today.getMonth() + 1).padStart(2, '0');
-        document.getElementById('orderDate').value = today.toISOString().split('T')[0];
-        
-        renderOrders();
-        renderCalendar();
-        generateTodayTasks();
-        renderTodayTasks();
+        function renderCalendario() {
+            const container = document.getElementById('calendario-content');
+            const today = new Date();
+            const month = today.getMonth();
+            const year = today.getFullYear();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            let html = `<h3 style="margin-bottom: 1rem; color: #D85A30;">${months[month]} ${year}</h3>`;
+            html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 1rem;">';
+            
+            for (let i = 0; i < firstDay; i++) html += '<div></div>';
+            
+            for (let d = 1; d <= daysInMonth; d++) {
+                const isToday = d === today.getDate();
+                html += `<div class="calendar-day ${isToday ? 'today' : ''}" style="cursor: default;">${d}</div>`;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderRastreador() {
+            const container = document.getElementById('rastreador-content');
+            const byStatus = {};
+            statuses.forEach(s => byStatus[s] = []);
+
+            orders.forEach(o => {
+                if (o.status === 'completed') return;
+                o.pieces.forEach(p => {
+                    if (!byStatus[p.status]) byStatus[p.status] = [];
+                    byStatus[p.status].push({name: p.name, client: o.name});
+                });
+            });
+
+            let html = '';
+            statuses.forEach(status => {
+                if (byStatus[status].length === 0) return;
+                html += `<h3 style="color: #D85A30; margin: 1rem 0 0.5rem 0;">${status} (${byStatus[status].length})</h3>`;
+                html += byStatus[status].map(p => `
+                    <div class="card" style="margin-bottom: 0.5rem;">
+                        <div style="font-weight: 600; font-size: 13px;">${p.name}</div>
+                        <div style="font-size: 12px; color: #888;">Cliente: ${p.client}</div>
+                    </div>
+                `).join('');
+            });
+
+            container.innerHTML = html || '<div class="empty-state">Todas as peças prontas! 🎉</div>';
+        }
+
+        function renderConcluidos() {
+            const container = document.getElementById('concluidos-content');
+            const completed = orders.filter(o => o.status === 'completed');
+
+            if (completed.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum pedido concluído</div>';
+                return;
+            }
+
+            container.innerHTML = completed.map(o => `
+                <div class="card">
+                    <div class="card-header">✅ ${o.name}</div>
+                    <div class="card-info">📅 ${o.date ? new Date(o.date).toLocaleDateString('pt-BR') : 'SEM DATA'}</div>
+                    <div class="card-total">R$ ${(o.total + o.freight).toFixed(2)}</div>
+                    <div class="card-actions">
+                        <button class="btn-small danger" onclick="deleteOrder('${o.id}')">🗑️ Deletar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Init
+        renderAll();
     </script>
 </body>
 </html>
