@@ -1,937 +1,1404 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐞 Olive Faz - Dashboard</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: #f5f3f0;
-            color: #333;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #D85A30 0%, #C74A1F 100%);
-            color: white;
-            padding: 1.5rem;
-            text-align: center;
-        }
-        
-        .header h1 { font-size: 24px; margin-bottom: 0.3rem; }
-        .header p { font-size: 12px; opacity: 0.9; }
-        
-        .tabs {
-            display: flex;
-            gap: 0;
-            background: white;
-            border-bottom: 2px solid #e0e0e0;
-            overflow-x: auto;
-            padding: 0 1rem;
-        }
-        
-        .tab-btn {
-            flex: 1;
-            padding: 12px 16px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            font-size: 13px;
-            color: #888;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        
-        .tab-btn.active {
-            color: #D85A30;
-            border-bottom-color: #D85A30;
-            font-weight: 600;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-        
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        .btn-primary {
-            background: #D85A30;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-        
-        .btn-primary:hover { background: #C74A1F; }
-        
-        .card {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .card.late {
-            border-left: 4px solid #D85A30;
-            background: #FFF5F0;
-        }
-        
-        .card.alert {
-            border-left: 4px solid #FF6B00;
-            background: #FFF0E6;
-        }
-        
-        .card-header {
-            font-weight: 600;
-            font-size: 15px;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-        
-        .card-info {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 0.3rem;
-        }
-        
-        .card-total {
-            font-size: 14px;
-            font-weight: 600;
-            color: #D85A30;
-            margin: 0.5rem 0;
-        }
-        
-        .card-actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 0.75rem;
-            flex-wrap: wrap;
-        }
-        
-        .btn-small {
-            flex: 1;
-            padding: 6px 8px;
-            font-size: 11px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            min-width: 70px;
-        }
-        
-        .btn-small:hover { background: #e0e0e0; }
-        .btn-small.danger { background: #FFE6E6; color: #C00; }
-        .btn-small.success { background: #E6F7E6; color: #080; }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .modal.active { display: flex; align-items: center; justify-content: center; }
-        
-        .modal-content {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 4px;
-            display: block;
-        }
-        
-        .form-input, .form-select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #D85A30;
-            box-shadow: 0 0 0 2px rgba(216,90,48,0.1);
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e0e0e0;
-        }
-        
-        .modal-actions button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        
-        .btn-save {
-            background: #D85A30;
-            color: white;
-        }
-        
-        .btn-cancel {
-            background: #e0e0e0;
-            color: #666;
-        }
-        
-        .pieces-list {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid #e0e0e0;
-            font-size: 12px;
-        }
-        
-        .piece-item {
-            background: #f9f9f9;
-            padding: 0.5rem;
-            border-radius: 3px;
-            margin-bottom: 0.4rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .empty-state {
-            color: #888;
-            text-align: center;
-            padding: 2rem;
-        }
-        
-        .stock-quantity {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-        }
-        
-        .stock-quantity input {
-            width: 60px;
-            padding: 4px;
-            border: 1px solid #e0e0e0;
-            border-radius: 3px;
-            font-size: 12px;
-        }
-        
-        @media (max-width: 600px) {
-            .header h1 { font-size: 20px; }
-            .tab-btn { font-size: 12px; padding: 10px 8px; }
-            .card-actions { flex-direction: column; }
-            .btn-small { width: 100%; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐞 Olive Faz - Dashboard</title>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/react-dom.production.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    :root {
+      --coral: #D85A30;
+      --coral-light: #E8714A;
+      --coral-dark: #B8461D;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f3f0;
+      --border: #e0d5d0;
+      --success: #3B6D11;
+      --warning: #BA7517;
+      --danger: #A32D2D;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text-primary: #f5f5f5;
+        --text-secondary: #b0b0b0;
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2a2a2a;
+        --border: #3a3a3a;
+      }
+    }
+
+    #root {
+      min-height: 100vh;
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    input, textarea, select {
+      font-family: inherit;
+    }
+
+    /* Scrollbar estilizado */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🐞 Olive Faz</h1>
-        <p>Dashboard de Gestão</p>
-    </div>
-    
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('proximos')">🚀 Próximos</button>
-        <button class="tab-btn" onclick="switchTab('pedidos')">📋 Pedidos</button>
-        <button class="tab-btn" onclick="switchTab('tarefas')">✓ Tarefas</button>
-        <button class="tab-btn" onclick="switchTab('calendario')">📅 Calendário</button>
-        <button class="tab-btn" onclick="switchTab('rastreador')">🎨 Rastear</button>
-        <button class="tab-btn" onclick="switchTab('estoque')">📦 Estoque</button>
-        <button class="tab-btn" onclick="switchTab('concluidos')">✅ Concluído</button>
-    </div>
-    
-    <div class="container">
-        <!-- PRÓXIMOS -->
-        <div id="proximos" class="tab-content active">
-            <div id="proximos-content"></div>
-        </div>
-        
-        <!-- PEDIDOS -->
-        <div id="pedidos" class="tab-content">
-            <button class="btn-primary" onclick="openOrderModal()">+ Novo Pedido</button>
-            <div id="pedidos-content"></div>
-        </div>
-        
-        <!-- TAREFAS -->
-        <div id="tarefas" class="tab-content">
-            <button class="btn-primary" onclick="openTaskModal()">+ Nova Tarefa</button>
-            <div id="tarefas-content"></div>
-        </div>
-        
-        <!-- CALENDÁRIO -->
-        <div id="calendario" class="tab-content">
-            <div id="calendario-content"></div>
-        </div>
-        
-        <!-- RASTREADOR -->
-        <div id="rastreador" class="tab-content">
-            <div id="rastreador-content"></div>
-        </div>
-        
-        <!-- ESTOQUE -->
-        <div id="estoque" class="tab-content">
-            <button class="btn-primary" onclick="openStockModal()">+ Novo Item</button>
-            <div id="estoque-content"></div>
-        </div>
-        
-        <!-- CONCLUÍDOS -->
-        <div id="concluidos" class="tab-content">
-            <div id="concluidos-content"></div>
-        </div>
-    </div>
-    
-    <!-- MODAL NOVO PEDIDO -->
-    <div id="orderModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Novo Pedido</div>
-            <input type="hidden" id="orderEditId">
-            
-            <div class="form-group">
-                <label class="form-label">Nome da Cliente *</label>
-                <input type="text" id="orderName" class="form-input" placeholder="Maria">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Data de Envio</label>
-                <input type="date" id="orderDate" class="form-input">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Descrição das Peças *</label>
-                <textarea id="orderPieces" class="form-input" placeholder="Cogumelo; Espelho 20cm; Quadrinho Personalizado" style="min-height: 60px;"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Valor Total (R$)</label>
-                <input type="number" id="orderTotal" class="form-input" step="0.01" placeholder="0.00">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Frete (R$)</label>
-                <input type="number" id="orderFreight" class="form-input" step="0.01" placeholder="0.00">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Observações</label>
-                <textarea id="orderNotes" class="form-input" placeholder="Comentários gerais" style="min-height: 60px;"></textarea>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn-save" onclick="saveOrder()">Salvar Pedido</button>
-                <button class="btn-cancel" onclick="closeModal('orderModal')">Cancelar</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- MODAL NOVA TAREFA -->
-    <div id="taskModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Nova Tarefa</div>
-            
-            <div class="form-group">
-                <label class="form-label">Tarefa *</label>
-                <textarea id="taskTitle" class="form-input" placeholder="O que você precisa fazer?" style="min-height: 60px;"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Data</label>
-                <input type="date" id="taskDate" class="form-input">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Periodicidade</label>
-                <select id="taskPeriod" class="form-select">
-                    <option value="once">Apenas uma vez</option>
-                    <option value="daily">Diária</option>
-                    <option value="weekly">Semanal</option>
-                    <option value="monthly">Mensal</option>
-                    <option value="custom">Personalizada</option>
-                </select>
-            </div>
-            
-            <div class="form-group" id="customPeriodGroup" style="display: none;">
-                <label class="form-label">A cada quantos dias?</label>
-                <input type="number" id="taskCustomDays" class="form-input" placeholder="7" min="1">
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn-save" onclick="saveTask()">Criar Tarefa</button>
-                <button class="btn-cancel" onclick="closeModal('taskModal')">Cancelar</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- MODAL NOVO ITEM ESTOQUE -->
-    <div id="stockModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Novo Item de Estoque</div>
-            
-            <div class="form-group">
-                <label class="form-label">Nome do Produto *</label>
-                <input type="text" id="stockName" class="form-input" placeholder="Ex: Verniz">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Quantidade Inicial *</label>
-                <input type="number" id="stockQuantity" class="form-input" placeholder="0" min="0">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Limite de Alerta *</label>
-                <input type="number" id="stockAlert" class="form-input" placeholder="Quantidade mínima" min="0">
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn-save" onclick="saveStock()">Adicionar Item</button>
-                <button class="btn-cancel" onclick="closeModal('stockModal')">Cancelar</button>
-            </div>
-        </div>
-    </div>
+  <div id="root"></div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js"></script>
+  <script>
+    const { useState, useEffect, useCallback, useRef, createContext, useContext } = React;
+    const { createRoot } = ReactDOM;
 
-    <script>
-        // Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyDdG0O7FdnOP6h6_kxBkidiJPrdfR68CvM",
-            authDomain: "olivefazdashboard.firebaseapp.com",
-            databaseURL: "https://olivefazdashboard-default-rtdb.firebaseio.com",
-            projectId: "olivefazdashboard",
-            storageBucket: "olivefazdashboard.firebasestorage.app",
-            messagingSenderId: "1053334296381",
-            appId: "1:1053334296381:web:d73296c3f7091fdc1dd754",
-            measurementId: "G-8XQVW5EM1Y"
-        };
+    // Firebase Config
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyDdG0O7FdnOP6h6_kxBkidiJPrdfR68CvM",
+      authDomain: "olivefazdashboard.firebaseapp.com",
+      databaseURL: "https://olivefazdashboard-default-rtdb.firebaseio.com",
+      projectId: "olivefazdashboard",
+      storageBucket: "olivefazdashboard.firebasestorage.app",
+      messagingSenderId: "1053334296381",
+      appId: "1:1053334296381:web:d73296c3f7091fdc1dd754",
+      measurementId: "G-8XQVW5EM1Y"
+    };
 
-        let firebaseReady = false;
-        let fbDb = null;
+    // ========== MAIN APP ==========
+    function OliveFazDashboard() {
+      const [currentTab, setCurrentTab] = useState(0);
+      const [data, setData] = useState({
+        tarefas: [
+          { id: 1, nome: 'Modelagem', data: new Date().toISOString().split('T')[0], frequencia: 'Semanal', pecas: [], completa: false, cor: '#7cb342' },
+          { id: 2, nome: 'Pintura', data: new Date().toISOString().split('T')[0], frequencia: 'Semanal', pecas: [], completa: false, cor: '#e53935' }
+        ],
+        pedidos: [
+          { id: 1, cliente: 'Ana Silva', dataEnvio: '2026-04-25', valor: 450, frete: 30, pecas: ['Joaninha', 'Espelho'], observacoes: 'Preferência por cores pastéis', imagem: null, atrasado: false, pecasDetalhadas: [{ nome: 'Joaninha', status: 'Pintura' }, { nome: 'Espelho', status: 'Secando' }] }
+        ],
+        planejamento: [],
+        estoque: [
+          { id: 1, nome: 'Caixa de Envio', categoria: 'Por Pedido', quantidade: 5, limite: 10 },
+          { id: 2, nome: 'Plástico Bolha', categoria: 'Por Peça', quantidade: 8, limite: 15 },
+          { id: 3, nome: 'Saquinho de Papel', categoria: 'Por Pedido', quantidade: 3, limite: 10 }
+        ],
+        concluidos: [
+          { id: 1, cliente: 'Laura Costa', dataEnvio: '2026-04-18', valor: 280, frete: 25, pecas: ['Joaninha branca', 'Planta'], imagem: null },
+          { id: 2, cliente: 'Sofia Mendes', dataEnvio: '2026-04-15', valor: 450, frete: 30, pecas: ['Espelho 30cm', 'Cogumelo verde'], imagem: null }
+        ]
+      });
+      const [syncStatus, setSyncStatus] = useState('synced');
+      const firebaseReady = useRef(false);
 
-        try {
-            firebase.initializeApp(firebaseConfig);
-            fbDb = firebase.database();
-            firebaseReady = true;
-            loadFromFirebase();
-        } catch(error) {
-            firebaseReady = false;
+      // Load from localStorage
+      useEffect(() => {
+        const saved = localStorage.getItem('olivefaz-data');
+        if (saved) {
+          try {
+            setData(JSON.parse(saved));
+          } catch (e) {
+            console.error('Failed to load saved data', e);
+          }
         }
+      }, []);
 
-        // Data
-        let orders = JSON.parse(localStorage.getItem('olive_orders') || '[]');
-        let tasks = JSON.parse(localStorage.getItem('olive_tasks') || '[]');
-        let stock = JSON.parse(localStorage.getItem('olive_stock') || '[]');
-        const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-        const statuses = ['Modelagem', 'Lixamento', 'Pintura', 'Verniz 1', 'Verniz 2', 'Secando', 'Pronto'];
+      // Save to localStorage
+      useEffect(() => {
+        localStorage.setItem('olivefaz-data', JSON.stringify(data));
+      }, [data]);
 
-        // Load Firebase
-        function loadFromFirebase() {
-            if (!firebaseReady) return;
-            try {
-                fbDb.ref('orders').on('value', (snapshot) => {
-                    if (snapshot.exists()) {
-                        orders = snapshot.val();
-                        localStorage.setItem('olive_orders', JSON.stringify(orders));
-                        renderAll();
-                    }
-                });
-                fbDb.ref('tasks').on('value', (snapshot) => {
-                    if (snapshot.exists()) {
-                        tasks = snapshot.val();
-                        localStorage.setItem('olive_tasks', JSON.stringify(tasks));
-                        renderAll();
-                    }
-                });
-                fbDb.ref('stock').on('value', (snapshot) => {
-                    if (snapshot.exists()) {
-                        stock = snapshot.val();
-                        localStorage.setItem('olive_stock', JSON.stringify(stock));
-                        renderAll();
-                    }
-                });
-            } catch(error) {}
+      const updateData = useCallback((key, newValue) => {
+        setData(prev => ({ ...prev, [key]: newValue }));
+      }, []);
+
+      const tabs = [
+        { name: 'Tarefas do Dia', icon: '📋' },
+        { name: 'Próximos', icon: '🚀' },
+        { name: 'Pedidos', icon: '📝' },
+        { name: 'Planejamento', icon: '📅' },
+        { name: 'Rastreador', icon: '🎨' },
+        { name: 'Estoque', icon: '📦' },
+        { name: 'Calendário', icon: '📊' },
+        { name: 'Concluídos', icon: '✅' },
+        { name: 'Relatórios', icon: '📈' }
+      ];
+
+      const renderTab = () => {
+        switch (currentTab) {
+          case 0:
+            return React.createElement(TabTarefasDia, { data, updateData });
+          case 1:
+            return React.createElement(TabProximos, { data, updateData });
+          case 2:
+            return React.createElement(TabPedidos, { data, updateData });
+          case 3:
+            return React.createElement(TabPlanejamento, { data, updateData });
+          case 4:
+            return React.createElement(TabRastreador, { data, updateData });
+          case 5:
+            return React.createElement(TabEstoque, { data, updateData });
+          case 6:
+            return React.createElement(TabCalendario, { data, updateData });
+          case 7:
+            return React.createElement(TabConcluidos, { data, updateData });
+          case 8:
+            return React.createElement(TabRelatorios, { data, updateData });
+          default:
+            return null;
         }
+      };
 
-        // Sync Firebase
-        function syncFirebase() {
-            if (!firebaseReady) return;
-            try {
-                fbDb.ref('orders').set(orders);
-                fbDb.ref('tasks').set(tasks);
-                fbDb.ref('stock').set(stock);
-            } catch(error) {}
-        }
+      return React.createElement('div', { style: styles.container },
+        React.createElement('div', { style: styles.header },
+          React.createElement('div', { style: styles.headerContent },
+            React.createElement('h1', { style: styles.title }, '🐞 Olive Faz'),
+            React.createElement('p', { style: styles.subtitle }, 'Dashboard de Produção')
+          ),
+          React.createElement('div', { style: styles.syncIndicator },
+            syncStatus === 'synced' ? '✓ Sincronizado' :
+            syncStatus === 'syncing' ? '⟳ Sincronizando...' : '⚠ Offline'
+          )
+        ),
 
-        // UI
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
-            document.getElementById(tab).classList.add('active');
-            event.target.classList.add('active');
-        }
+        React.createElement('div', { style: styles.tabNav },
+          tabs.map((tab, idx) =>
+            React.createElement('button', {
+              key: idx,
+              onClick: () => setCurrentTab(idx),
+              style: { ...styles.tabButton, ...(currentTab === idx ? styles.tabButtonActive : {}) }
+            },
+              React.createElement('span', null, tab.icon),
+              React.createElement('span', { style: { fontSize: '11px', marginTop: '4px' } }, tab.name)
+            )
+          )
+        ),
 
-        function openOrderModal(id = null) {
-            document.getElementById('orderEditId').value = id || '';
-            document.getElementById('orderName').value = '';
-            document.getElementById('orderDate').value = '';
-            document.getElementById('orderPieces').value = '';
-            document.getElementById('orderTotal').value = '';
-            document.getElementById('orderFreight').value = '';
-            document.getElementById('orderNotes').value = '';
-            
-            if (id) {
-                const order = orders.find(o => o.id === id);
-                if (order) {
-                    document.getElementById('orderName').value = order.name;
-                    document.getElementById('orderDate').value = order.date || '';
-                    document.getElementById('orderPieces').value = order.pieces.map(p => p.name).join('; ');
-                    document.getElementById('orderTotal').value = order.total;
-                    document.getElementById('orderFreight').value = order.freight;
-                    document.getElementById('orderNotes').value = order.notes;
-                }
-            }
-            
-            document.getElementById('orderModal').classList.add('active');
-        }
+        React.createElement('div', { style: styles.tabContent },
+          renderTab()
+        )
+      );
+    }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-        }
+    // ========== TAB COMPONENTS ==========
 
-        function saveOrder() {
-            const editId = document.getElementById('orderEditId').value;
-            const name = document.getElementById('orderName').value.trim();
-            const date = document.getElementById('orderDate').value;
-            const pieces = document.getElementById('orderPieces').value;
-            const total = parseFloat(document.getElementById('orderTotal').value) || 0;
-            const freight = parseFloat(document.getElementById('orderFreight').value) || 0;
-            const notes = document.getElementById('orderNotes').value;
+    function TabTarefasDia({ data, updateData }) {
+      const [showModal, setShowModal] = useState(null);
 
-            if (!name || !pieces) {
-                alert('Preencha nome e peças!');
-                return;
-            }
+      return React.createElement('div', { style: styles.tabPanel },
+        React.createElement('h2', { style: styles.sectionTitle }, 'Tarefas de Hoje'),
+        React.createElement('div', { style: styles.cardGrid },
+          data.tarefas.length === 0 ?
+            React.createElement('p', { style: styles.emptyState }, 'Nenhuma tarefa para hoje 🎉') :
+            data.tarefas.map(tarefa =>
+              React.createElement('div', {
+                key: tarefa.id,
+                style: styles.card,
+                onClick: () => setShowModal(tarefa)
+              },
+                React.createElement('div', { style: styles.taskCardContent },
+                  React.createElement('h3', { style: styles.cardTitle }, tarefa.nome),
+                  React.createElement('div', { style: styles.taskMeta },
+                    React.createElement('span', { style: styles.badge }, '🔄 ' + tarefa.frequencia)
+                  )
+                ),
+                React.createElement('input', {
+                  type: 'checkbox',
+                  style: styles.taskCheckbox,
+                  onChange: () => {},
+                  onClick: (e) => e.stopPropagation()
+                })
+              )
+            )
+        ),
+        showModal && React.createElement(Modal, {
+          title: showModal.nome,
+          onClose: () => setShowModal(null)
+        },
+          React.createElement('div', { style: styles.modalContent },
+            React.createElement('h3', { style: styles.modalTitle }, 'Peças desta tarefa'),
+            React.createElement('p', { style: styles.emptyState }, 'Nenhuma peça nesta tarefa'),
+            React.createElement('div', { style: styles.formActions },
+              React.createElement('button', { style: styles.btnSecondary, onClick: () => setShowModal(null) }, 'Fechar'),
+              React.createElement('button', { style: styles.btnPrimary }, 'Marcar como Completo')
+            )
+          )
+        )
+      );
+    }
 
-            const piecesArray = pieces.split(';').map(p => ({
-                name: p.trim(),
-                status: 'Modelagem'
-            })).filter(p => p.name);
+    function TabProximos({ data, updateData }) {
+      return React.createElement('div', { style: styles.tabPanel },
+        React.createElement('h2', { style: styles.sectionTitle }, 'Próximos Pedidos'),
+        React.createElement('div', { style: styles.cardGrid },
+          data.pedidos.length === 0 ?
+            React.createElement('p', { style: styles.emptyState }, 'Nenhum pedido pendente') :
+            data.pedidos.map(pedido => {
+              const dataFormatada = new Date(pedido.dataEnvio).toLocaleDateString('pt-BR');
+              return React.createElement('div', { key: pedido.id, style: styles.card },
+                React.createElement('div', { style: styles.cardHeader },
+                  React.createElement('h3', { style: styles.cardTitle }, pedido.cliente),
+                  pedido.atrasado && React.createElement('span', { style: styles.badgeAtrasado }, '⚠️ ATRASADO')
+                ),
+                React.createElement('div', { style: styles.cardMeta },
+                  React.createElement('span', null, '📅 ' + dataFormatada),
+                  React.createElement('span', null, '💰 R$ ' + (pedido.valor + pedido.frete))
+                ),
+                React.createElement('p', { style: styles.cardText }, pedido.pecas.join(', ')),
+                pedido.observacoes && React.createElement('p', { style: styles.cardSmall }, pedido.observacoes),
+                React.createElement('div', { style: styles.cardActions },
+                  React.createElement('button', { style: styles.btnSmall }, '✏️ Editar'),
+                  React.createElement('button', { style: styles.btnSmall }, '✅ Concluir'),
+                  React.createElement('button', { style: styles.btnSmallDanger }, '🗑️ Deletar')
+                )
+              );
+            })
+        )
+      );
+    }
 
-            if (editId) {
-                const idx = orders.findIndex(o => o.id === editId);
-                if (idx >= 0) {
-                    orders[idx] = {
-                        ...orders[idx],
-                        name,
-                        date: date || null,
-                        pieces: piecesArray,
-                        total,
-                        freight,
-                        notes
-                    };
-                }
-            } else {
-                orders.push({
-                    id: 'ord_' + Date.now(),
-                    name,
-                    date: date || null,
-                    pieces: piecesArray,
-                    total,
-                    freight,
-                    notes,
-                    status: 'pending',
-                    createdAt: new Date().toISOString()
-                });
-            }
+    function TabPedidos({ data, updateData }) {
+      const [showModal, setShowModal] = useState(false);
+      const [pedidoForm, setPedidoForm] = useState({
+        cliente: '',
+        dataEnvio: '',
+        descricaoPecas: '',
+        valorTotal: '',
+        frete: '',
+        observacoes: '',
+        imagem: null
+      });
 
-            localStorage.setItem('olive_orders', JSON.stringify(orders));
-            syncFirebase();
-            closeModal('orderModal');
-            renderAll();
-        }
-
-        function deleteOrder(id) {
-            if (confirm('Deletar pedido?')) {
-                orders = orders.filter(o => o.id !== id);
-                localStorage.setItem('olive_orders', JSON.stringify(orders));
-                syncFirebase();
-                renderAll();
-            }
-        }
-
-        function updateOrderStatus(id) {
-            const order = orders.find(o => o.id === id);
-            if (order) {
-                order.status = order.status === 'pending' ? 'completed' : 'pending';
-                localStorage.setItem('olive_orders', JSON.stringify(orders));
-                syncFirebase();
-                renderAll();
-            }
-        }
-
-        function updatePieceStatus(orderId, pieceIdx, newStatus) {
-            const order = orders.find(o => o.id === orderId);
-            if (order && order.pieces[pieceIdx]) {
-                order.pieces[pieceIdx].status = newStatus;
-                localStorage.setItem('olive_orders', JSON.stringify(orders));
-                syncFirebase();
-                renderAll();
-            }
-        }
-
-        function openTaskModal() {
-            document.getElementById('taskTitle').value = '';
-            document.getElementById('taskDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('taskPeriod').value = 'once';
-            document.getElementById('taskCustomDays').value = '';
-            document.getElementById('customPeriodGroup').style.display = 'none';
-            document.getElementById('taskModal').classList.add('active');
-        }
-
-        document.addEventListener('change', (e) => {
-            if (e.target.id === 'taskPeriod') {
-                document.getElementById('customPeriodGroup').style.display = 
-                    e.target.value === 'custom' ? 'block' : 'none';
-            }
+      const handleAddPedido = (e) => {
+        e.preventDefault();
+        console.log('Novo pedido:', pedidoForm);
+        setShowModal(false);
+        setPedidoForm({
+          cliente: '',
+          dataEnvio: '',
+          descricaoPecas: '',
+          valorTotal: '',
+          frete: '',
+          observacoes: '',
+          imagem: null
         });
+      };
 
-        function saveTask() {
-            const title = document.getElementById('taskTitle').value;
-            const date = document.getElementById('taskDate').value;
-            const period = document.getElementById('taskPeriod').value;
-            const customDays = parseInt(document.getElementById('taskCustomDays').value) || 0;
+      return React.createElement('div', { style: styles.tabPanel },
+        React.createElement('div', { style: styles.headerWithButton },
+          React.createElement('h2', { style: styles.sectionTitle }, 'Pedidos em Andamento'),
+          React.createElement('button', {
+            onClick: () => setShowModal(true),
+            style: styles.btnPrimary
+          }, '+ Novo Pedido')
+        ),
 
-            if (!title) {
-                alert('Escreva uma tarefa!');
-                return;
-            }
+        React.createElement('div', { style: styles.pedidosPorMes },
+          data.pedidos.length > 0 &&
+            React.createElement('div', null,
+              React.createElement('h3', { style: styles.monthTitle }, 'Abril 2026'),
+              React.createElement('div', { style: styles.cardGrid },
+                data.pedidos.map(pedido =>
+                  React.createElement('div', { key: pedido.id, style: styles.card },
+                    React.createElement('h3', { style: styles.cardTitle }, pedido.cliente),
+                    React.createElement('div', { style: styles.pedidoDetails },
+                      React.createElement('p', null, React.createElement('strong', null, 'Peças: '), pedido.pecas.join(', ')),
+                      React.createElement('p', null, React.createElement('strong', null, 'Valor: '), 'R$ ' + pedido.valor),
+                      React.createElement('p', null, React.createElement('strong', null, 'Frete: '), 'R$ ' + pedido.frete),
+                      pedido.observacoes && React.createElement('p', null, React.createElement('strong', null, 'Obs: '), pedido.observacoes)
+                    ),
+                    React.createElement('div', { style: styles.pecasStatus },
+                      pedido.pecasDetalhadas.map((peca, idx) =>
+                        React.createElement('div', { key: idx, style: styles.pecaStatusItem },
+                          React.createElement('span', null, peca.nome),
+                          React.createElement('span', { style: styles.statusBadge }, peca.status)
+                        )
+                      )
+                    ),
+                    React.createElement('div', { style: styles.cardActions },
+                      React.createElement('button', { style: styles.btnSmall }, '✏️ Editar'),
+                      React.createElement('button', { style: styles.btnSmall }, '🗑️ Deletar')
+                    )
+                  )
+                )
+              )
+            ),
+          data.pedidos.length === 0 &&
+            React.createElement('p', { style: styles.emptyState }, 'Nenhum pedido em andamento')
+        ),
 
-            tasks.push({
-                id: 'tsk_' + Date.now(),
-                title,
-                date,
-                period,
-                customDays: period === 'custom' ? customDays : null,
-                completed: false,
-                createdAt: new Date().toISOString()
-            });
+        showModal && React.createElement(Modal, {
+          title: 'Novo Pedido',
+          onClose: () => setShowModal(false)
+        },
+          React.createElement('form', { onSubmit: handleAddPedido, style: styles.form },
+            React.createElement(FormField, {
+              label: 'Nome da cliente',
+              placeholder: 'Maria ou Ana',
+              value: pedidoForm.cliente,
+              onChange: (e) => setPedidoForm({ ...pedidoForm, cliente: e.target.value })
+            }),
+            React.createElement(FormField, {
+              label: 'Data de envio',
+              type: 'date',
+              value: pedidoForm.dataEnvio,
+              onChange: (e) => setPedidoForm({ ...pedidoForm, dataEnvio: e.target.value })
+            }),
+            React.createElement(FormField, {
+              label: 'Descrição das peças',
+              placeholder: 'Cogumelo; Espelho 20cm; Quadrinho Personalizado',
+              value: pedidoForm.descricaoPecas,
+              onChange: (e) => setPedidoForm({ ...pedidoForm, descricaoPecas: e.target.value }),
+              multiline: true
+            }),
+            React.createElement('div', { style: styles.formRow },
+              React.createElement(FormField, {
+                label: 'Valor total',
+                type: 'number',
+                placeholder: 'R$',
+                value: pedidoForm.valorTotal,
+                onChange: (e) => setPedidoForm({ ...pedidoForm, valorTotal: e.target.value })
+              }),
+              React.createElement(FormField, {
+                label: 'Frete',
+                type: 'number',
+                placeholder: 'R$',
+                value: pedidoForm.frete,
+                onChange: (e) => setPedidoForm({ ...pedidoForm, frete: e.target.value })
+              })
+            ),
+            React.createElement(FormField, {
+              label: 'Observações',
+              placeholder: 'Comentários gerais',
+              value: pedidoForm.observacoes,
+              onChange: (e) => setPedidoForm({ ...pedidoForm, observacoes: e.target.value }),
+              multiline: true
+            }),
+            React.createElement('div', { style: styles.formActions },
+              React.createElement('button', { type: 'button', onClick: () => setShowModal(false), style: styles.btnSecondary }, 'Cancelar'),
+              React.createElement('button', { type: 'submit', style: styles.btnPrimary }, 'Salvar Pedido')
+            )
+          )
+        )
+      );
+    }
 
-            localStorage.setItem('olive_tasks', JSON.stringify(tasks));
-            syncFirebase();
-            closeModal('taskModal');
-            renderAll();
-        }
+    function TabPlanejamento({ data, updateData }) {
+      const [viewMode, setViewMode] = useState('dia');
+      const [dataAtual, setDataAtual] = useState(new Date());
 
-        function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            localStorage.setItem('olive_tasks', JSON.stringify(tasks));
-            syncFirebase();
-            renderAll();
-        }
+      const diasEspeciais = [
+        { data: '2026-04-21', tipo: 'feriado', nome: 'Tiradentes' },
+        { data: '2026-04-25', tipo: 'crianca', nome: 'Criança sem aula' }
+      ];
 
-        function toggleTask(id) {
-            const task = tasks.find(t => t.id === id);
-            if (task) task.completed = !task.completed;
-            localStorage.setItem('olive_tasks', JSON.stringify(tasks));
-            syncFirebase();
-            renderAll();
-        }
+      const mudaDia = (dias) => {
+        const novaData = new Date(dataAtual);
+        novaData.setDate(novaData.getDate() + dias);
+        setDataAtual(novaData);
+      };
 
-        function openStockModal() {
-            document.getElementById('stockName').value = '';
-            document.getElementById('stockQuantity').value = '';
-            document.getElementById('stockAlert').value = '';
-            document.getElementById('stockModal').classList.add('active');
-        }
+      const dataStr = dataAtual.toLocaleDateString('pt-BR');
+      const diaSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][dataAtual.getDay()];
+      const dataAtualStr = `${dataAtual.getFullYear()}-${String(dataAtual.getMonth() + 1).padStart(2, '0')}-${String(dataAtual.getDate()).padStart(2, '0')}`;
+      const especial = diasEspeciais.find(d => d.data === dataAtualStr);
 
-        function saveStock() {
-            const name = document.getElementById('stockName').value.trim();
-            const quantity = parseInt(document.getElementById('stockQuantity').value) || 0;
-            const alert = parseInt(document.getElementById('stockAlert').value) || 0;
+      return React.createElement('div', { style: styles.tabPanel },
+        React.createElement('div', { style: styles.headerWithButton },
+          React.createElement('h2', { style: styles.sectionTitle }, 'Planejamento'),
+          React.createElement('div', { style: styles.viewModeButtons },
+            ['dia', 'semana', 'mes'].map(mode =>
+              React.createElement('button', {
+                key: mode,
+                onClick: () => setViewMode(mode),
+                style: { ...styles.viewModeBtn, ...(viewMode === mode ? styles.viewModeBtnActive : {}) }
+              }, mode.charAt(0).toUpperCase() + mode.slice(1))
+            )
+          )
+        ),
 
-            if (!name || quantity < 0 || alert < 0) {
-                alert('Preencha corretamente!');
-                return;
-            }
+        viewMode === 'dia' &&
+          React.createElement('div', { style: styles.viewDiaContainer },
+            React.createElement('div', { style: styles.diaHeader },
+              React.createElement('button', { onClick: () => mudaDia(-1), style: styles.btnSecondary }, '← Anterior'),
+              React.createElement('div', null,
+                React.createElement('h3', { style: styles.diaTitle }, `${diaSemana} ${dataStr}`),
+                especial && React.createElement('p', { style: styles.especialLabel }, `${especial.tipo === 'feriado' ? '🎉' : '👧'} ${especial.nome}`)
+              ),
+              React.createElement('button', { onClick: () => mudaDia(1), style: styles.btnSecondary }, 'Próximo →')
+            ),
+            React.createElement('div', { style: styles.diaContent },
+              React.createElement('h4', null, 'Tarefas agendadas'),
+              React.createElement('p', { style: styles.emptyState }, 'Nenhuma tarefa neste dia')
+            )
+          ),
 
-            stock.push({
-                id: 'stk_' + Date.now(),
-                name,
-                quantity,
-                alert,
-                createdAt: new Date().toISOString()
-            });
+        viewMode === 'mes' &&
+          React.createElement('p', { style: styles.emptyState }, 'Visualização por mês em desenvolvimento'),
 
-            localStorage.setItem('olive_stock', JSON.stringify(stock));
-            syncFirebase();
-            closeModal('stockModal');
-            renderAll();
-        }
+        viewMode === 'semana' &&
+          React.createElement('p', { style: styles.emptyState }, 'Visualização por semana em desenvolvimento')
+      );
+    }
 
-        function updateStockQuantity(id, newQty) {
-            const item = stock.find(s => s.id === id);
-            if (item) {
-                item.quantity = parseInt(newQty) || 0;
-                localStorage.setItem('olive_stock', JSON.stringify(stock));
-                syncFirebase();
-                renderAll();
-            }
-        }
+    function TabRastreador({ data, updateData }) {
+      const statusList = [
+        { status: 'Modelagem', count: 5, pecas: ['Joaninha verde', 'Espelho 20cm'] },
+        { status: 'Lixamento', count: 3, pecas: ['Cogumelo', 'Quadro personalizado'] },
+        { status: 'Pintura', count: 4, pecas: ['Espelho grande', 'Joaninha'] }
+      ];
 
-        function deleteStock(id) {
-            stock = stock.filter(s => s.id !== id);
-            localStorage.setItem('olive_stock', JSON.stringify(stock));
-            syncFirebase();
-            renderAll();
-        }
+      return React.createElement('div', { style: styles.tabPanel },
+        React.createElement('h2', { style: styles.sectionTitle }, 'Rastreador de Produção'),
+        React.createElement('div', { style: styles.rastreadorGrid },
+          statusList.map((item, idx) =>
+            React.createElement('div', { key: idx, style: styles.statusCard },
+              React.createElement('h3', { style: styles.statusTitle }, `${item.status} (${item.count})`),
+              React.createElement('div', { style: styles.pecasList },
+                item.pecas.map((peca, pidx) =>
+                  React.createElement('div', { key: pidx, style: styles.pecaItem }, peca)
+                )
+              )
+            )
+          )
+        ),
+        statusList.length === 0 && React.createElement('p', { style: styles.emptyState }, 'Todas as peças prontas! 🎉')
+      );
+    }
 
-        // Render
-        function renderAll() {
-            renderProximos();
-            renderPedidos();
-            renderTarefas();
-            renderCalendario();
-            renderRastreador();
-            renderEstoque();
-            renderConcluidos();
-        }
+    function TabEstoque({ data, updateData }) {
+      const [showModal, setShowModal] = useState(false);
 
-        function renderProximos() {
-            const container = document.getElementById('proximos-content');
-            const today = new Date();
-            const thisMonth = today.getMonth();
-            const thisYear = today.getFullYear();
+      return React.createElement('div', { style: styles.tabPanel },
+        React.createElement('div', { style: styles.headerWithButton },
+          React.createElement('h2', { style: styles.sectionTitle }, 'Estoque'),
+          React.createElement('button', {
+            onClick: () => setShowModal(true),
+            style: styles.btnPrimary
+          }, '+ Novo Item')
+        ),
 
-            const proximos = orders.filter(o => {
-                if (o.status === 'completed') return false;
-                if (!o.date) return false;
-                const oDate = new Date(o.date);
-                return (oDate.getMonth() === thisMonth && oDate.getFullYear() === thisYear) ||
-                       (oDate < today && oDate.getMonth() < thisMonth);
-            });
+        React.createElement('div', { style: styles.estoqueGrid },
+          data.estoque.map(item => {
+            const alertado = item.quantidade <= item.limite;
+            return React.createElement('div', {
+              key: item.id,
+              style: {
+                ...styles.estoqueCard,
+                borderLeft: `4px solid ${alertado ? 'var(--warning)' : 'var(--success)'}`
+              }
+            },
+              React.createElement('div', { style: styles.estoqueHeader },
+                React.createElement('h3', { style: styles.estoqueName }, item.nome),
+                alertado && React.createElement('span', { style: styles.alertBadge }, '⚠️ Baixo')
+              ),
+              React.createElement('p', { style: styles.estoqueCategory }, item.categoria),
+              React.createElement('div', { style: styles.estoqueQuantidade },
+                React.createElement('span', { style: styles.quantidadeValue }, item.quantidade),
+                React.createElement('span', { style: styles.quantidadeLimite }, `/ ${item.limite}`)
+              ),
+              React.createElement('input', {
+                type: 'number',
+                defaultValue: item.quantidade,
+                style: styles.quantidadeInput,
+                placeholder: 'Quantidade'
+              })
+            );
+          })
+        ),
 
-            if (proximos.length === 0) {
-                container.innerHTML = '<div class="empty-state">Nenhum pedido próximo</div>';
-                return;
-            }
+        showModal && React.createElement(Modal, {
+          title: 'Novo Item de Estoque',
+          onClose: () => setShowModal(false)
+        },
+          React.createElement('form', {
+            style: styles.form,
+            onSubmit: (e) => { e.preventDefault(); setShowModal(false); }
+          },
+            React.createElement(FormField, { label: 'Nome do produto', placeholder: 'Ex: Caixa de Envio' }),
+            React.createElement(FormField, {
+              label: 'Categoria',
+              as: 'select'
+            },
+              React.createElement('option', null, '📦 Por Pedido'),
+              React.createElement('option', null, '📄 Por Peça')
+            ),
+            React.createElement('div', { style: styles.formRow },
+              React.createElement(FormField, { label: 'Quantidade inicial', type: 'number' }),
+              React.createElement(FormField, { label: 'Limite de alerta', type: 'number' })
+            ),
+            React.createElement('div', { style: styles.formActions },
+              React.createElement('button', { type: 'button', onClick: () => setShowModal(false), style: styles.btnSecondary }, 'Cancelar'),
+              React.createElement('button', { type: 'submit', style: styles.btnPrimary }, 'Salvar Item')
+            )
+          )
+        )
+      );
+    }
 
-            container.innerHTML = proximos.map(o => {
-                const oDate = new Date(o.date);
-                const isLate = oDate < today && oDate.getMonth() < thisMonth;
-                return `
-                    <div class="card ${isLate ? 'late' : ''}">
-                        ${isLate ? '<div style="color: #D85A30; font-weight: 600; margin-bottom: 0.5rem;">⚠️ ATRASADO</div>' : ''}
-                        <div class="card-header">${o.name}</div>
-                        <div class="card-info">📅 ${oDate.toLocaleDateString('pt-BR')}</div>
-                        <div class="card-total">R$ ${(o.total + o.freight).toFixed(2)}</div>
-                        <div class="card-actions">
-                            <button class="btn-small" onclick="openOrderModal('${o.id}')">✏️ Editar</button>
-                            <button class="btn-small success" onclick="updateOrderStatus('${o.id}')">✅ Concluir</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+    function TabCalendario({ data, updateData }) {
+      const mes = 4; // Abril
+      const ano = 2026;
 
-        function renderPedidos() {
-            const container = document.getElementById('pedidos-content');
-            const pending = orders.filter(o => o.status !== 'completed');
+      const tarefasNoMes = [
+        { data: '2026-04-15', titulo: 'Modelagem', cor: '#7cb342' },
+        { data: '2026-04-16', titulo: 'Pintura', cor: '#d85a30' },
+        { data: '2026-04-21', titulo: 'Tiradentes', cor: '#ffb300', categoria: 'feriado' }
+      ];
 
-            if (pending.length === 0) {
-                container.innerHTML = '<div class="empty-state">Nenhum pedido em aberto</div>';
-                return;
-            }
+      const diasNoMes = new Date(ano, mes, 0).getDate();
+      const primeiroDia = new Date(ano, mes - 1, 1).getDay();
 
-            container.innerHTML = pending.map(o => `
-                <div class="card">
-                    <div class="card-header">${o.name}</div>
-                    <div class="card-info">📅 ${o.date ? new Date(o.date).toLocaleDateString('pt-BR') : 'SEM DATA'}</div>
-                    <div class="card-total">R$ ${(o.total + o.freight).toFixed(2)}</div>
-                    <div class="pieces-list">
-                        <strong>Peças:</strong>
-                        ${o.pieces.map((p, i) => `
-                            <div class="piece-item">
-                                <span>${p.name}</span>
-                                <select style="font-size: 11px;" onchange="updatePieceStatus('${o.id}', ${i}, this.value)">
-                                    ${statuses.map(s => `<option ${p.status === s ? 'selected' : ''}>${s}</option>`).join('')}
-                                </select>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn-small" onclick="openOrderModal('${o.id}')">✏️ Editar</button>
-                        <button class="btn-small danger" onclick="deleteOrder('${o.id}')">🗑️ Deletar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+      return React.createElement('div', { style: styles.tabPanel },
+        React.createElement('h2', { style: styles.sectionTitle }, 'Calendário - Abril 2026'),
+        React.createElement('div', { style: styles.calendarioGrid },
+          ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map(dia =>
+            React.createElement('div', { key: dia, style: styles.diaHeaderCal }, dia)
+          ),
+          Array.from({ length: primeiroDia }).map((_, i) =>
+            React.createElement('div', { key: `empty-${i}`, style: styles.diaCal })
+          ),
+          Array.from({ length: diasNoMes }).map((_, i) => {
+            const dia = i + 1;
+            const dataStr = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+            const tarefasDodia = tarefasNoMes.filter(t => t.data === dataStr);
+            const ehFeriado = tarefasDodia.some(t => t.categoria === 'feriado');
 
-        function renderTarefas() {
-            const container = document.getElementById('tarefas-content');
-            if (tasks.length === 0) {
-                container.innerHTML = '<div class="empty-state">Nenhuma tarefa</div>';
-                return;
-            }
+            return React.createElement('div', {
+              key: dia,
+              style: {
+                ...styles.diaCal,
+                backgroundColor: ehFeriado ? '#fff3e0' : 'transparent'
+              }
+            },
+              React.createElement('div', { style: styles.diaNumero }, dia),
+              React.createElement('div', { style: styles.diaFaixas },
+                tarefasDodia.map((t, idx) =>
+                  React.createElement('div', {
+                    key: idx,
+                    style: { ...styles.tarefaFaixa, backgroundColor: t.cor },
+                    title: t.titulo
+                  })
+                )
+              )
+            );
+          })
+        )
+      );
+    }
 
-            const periodLabels = {
-                'once': 'Uma vez',
-                'daily': '🔄 Diária',
-                'weekly': '🔄 Semanal',
-                'monthly': '🔄 Mensal',
-                'custom': '🔄 Customizada'
-            };
+    function TabConcluidos({ data, updateData }) {
+      return React.createElement('div', { style: styles.tabPanel },
+        React.createElement('h2', { style: styles.sectionTitle }, 'Pedidos Concluídos'),
+        React.createElement('div', { style: styles.cardGrid },
+          data.concluidos.length === 0 ?
+            React.createElement('p', { style: styles.emptyState }, 'Nenhum pedido concluído') :
+            data.concluidos.map(pedido => {
+              const dataFormatada = new Date(pedido.dataEnvio).toLocaleDateString('pt-BR');
+              return React.createElement('div', { key: pedido.id, style: styles.card },
+                React.createElement('div', { style: styles.cardHeader },
+                  React.createElement('h3', { style: styles.cardTitle }, pedido.cliente),
+                  React.createElement('span', { style: styles.badgeSucesso }, '✅ Concluído')
+                ),
+                React.createElement('div', { style: styles.cardMeta },
+                  React.createElement('span', null, '📅 ' + dataFormatada),
+                  React.createElement('span', null, '💰 R$ ' + (pedido.valor + pedido.frete))
+                ),
+                React.createElement('p', { style: styles.cardText }, pedido.pecas.join(', ')),
+                React.createElement('div', { style: styles.cardActions },
+                  React.createElement('button', { style: styles.btnSmall }, '📋 Detalhes'),
+                  React.createElement('button', { style: styles.btnSmallDanger }, '🗑️ Deletar')
+                )
+              );
+            })
+        )
+      );
+    }
 
-            container.innerHTML = tasks.map(t => `
-                <div class="card" style="${t.completed ? 'opacity: 0.6;' : ''}">
-                    <div class="card-header" style="${t.completed ? 'text-decoration: line-through;' : ''}">
-                        <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask('${t.id}')" style="margin-right: 0.5rem;">
-                        ${t.title}
-                    </div>
-                    <div class="card-info">📅 ${new Date(t.date).toLocaleDateString('pt-BR')} | ${periodLabels[t.period]} ${t.customDays ? '(' + t.customDays + 'd)' : ''}</div>
-                    <div class="card-actions">
-                        <button class="btn-small danger" onclick="deleteTask('${t.id}')">🗑️ Deletar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+    function TabRelatorios({ data, updateData }) {
+      // Calcular métricas
+      const calcularMetricas = () => {
+        const todosPedidos = [...data.pedidos, ...data.concluidos];
+        const totalPedidos = todosPedidos.length;
+        const totalRecebido = todosPedidos.reduce((sum, p) => sum + (p.valor || 0) + (p.frete || 0), 0);
+        const ticketMedio = totalPedidos > 0 ? totalRecebido / totalPedidos : 0;
+        const clientesUnicos = new Set(todosPedidos.map(p => p.cliente)).size;
+        const pedidosConcluidos = data.concluidos.length;
+        const pedidosPendentes = data.pedidos.length;
+        
+        return { totalPedidos, totalRecebido, ticketMedio, clientesUnicos, pedidosConcluidos, pedidosPendentes };
+      };
 
-        function renderCalendario() {
-            const container = document.getElementById('calendario-content');
-            const today = new Date();
-            const month = today.getMonth();
-            const year = today.getFullYear();
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const metricas = calcularMetricas();
 
-            let html = `<h3 style="margin-bottom: 1rem; color: #D85A30;">${months[month]} ${year}</h3>`;
-            html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;">';
-            
-            for (let i = 0; i < firstDay; i++) html += '<div></div>';
-            for (let d = 1; d <= daysInMonth; d++) {
-                const isToday = d === today.getDate();
-                html += `<div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #e0e0e0; border-radius: 4px; ${isToday ? 'background: #E6F7E6; color: #080; font-weight: 600;' : ''}">${d}</div>`;
-            }
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
+      // Exportar como JSON
+      const exportJSON = () => {
+        const dataStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `olive-faz-dados-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+      };
 
-        function renderRastreador() {
-            const container = document.getElementById('rastreador-content');
-            const byStatus = {};
-            statuses.forEach(s => byStatus[s] = []);
+      // Exportar como CSV
+      const exportCSV = () => {
+        let csv = 'CLIENTE,DATA_ENVIO,VALOR,FRETE,TOTAL,STATUS,PEÇAS\n';
+        const todosPedidos = [...data.pedidos, ...data.concluidos];
+        todosPedidos.forEach(p => {
+          const status = data.concluidos.includes(p) ? 'Concluído' : 'Pendente';
+          const total = (p.valor || 0) + (p.frete || 0);
+          const pecas = (p.pecas || []).join(';');
+          csv += `"${p.cliente}","${p.dataEnvio}",${p.valor || 0},${p.frete || 0},${total},"${status}","${pecas}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `olive-faz-pedidos-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+      };
 
-            orders.forEach(o => {
-                if (o.status === 'completed') return;
-                o.pieces.forEach(p => {
-                    if (!byStatus[p.status]) byStatus[p.status] = [];
-                    byStatus[p.status].push({name: p.name, client: o.name});
-                });
-            });
+      // Exportar Relatório Formatado
+      const exportRelatorio = () => {
+        const dataAtual = new Date().toLocaleDateString('pt-BR');
+        let relatorio = `\n═══════════════════════════════════════════════════\n        🐞 OLIVE FAZ - RELATÓRIO DE GESTÃO\n═══════════════════════════════════════════════════\n\nDATA: ${dataAtual}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📊 MÉTRICAS GERAIS\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTotal de Pedidos: ${metricas.totalPedidos}\n  • Concluídos: ${metricas.pedidosConcluidos}\n  • Pendentes: ${metricas.pedidosPendentes}\n\nClientes Únicos: ${metricas.clientesUnicos}\nFaturamento Total: R$ ${metricas.totalRecebido.toFixed(2)}\nTicket Médio: R$ ${metricas.ticketMedio.toFixed(2)}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📈 PEDIDOS CONCLUÍDOS (${metricas.pedidosConcluidos})\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        data.concluidos.forEach((p, idx) => {
+          const total = (p.valor || 0) + (p.frete || 0);
+          relatorio += `\n${idx + 1}. ${p.cliente}\n   Data: ${new Date(p.dataEnvio).toLocaleDateString('pt-BR')}\n   Peças: ${(p.pecas || []).join(', ')}\n   Total: R$ ${total}\n`;
+        });
+        relatorio += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n⏳ PEDIDOS PENDENTES (${metricas.pedidosPendentes})\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        data.pedidos.forEach((p, idx) => {
+          const total = (p.valor || 0) + (p.frete || 0);
+          const diasRestantes = Math.ceil((new Date(p.dataEnvio) - new Date()) / (1000 * 60 * 60 * 24));
+          const status = diasRestantes < 0 ? '⚠️ ATRASADO' : `📅 ${diasRestantes} dias`;
+          relatorio += `\n${idx + 1}. ${p.cliente} ${status}\n   Data: ${new Date(p.dataEnvio).toLocaleDateString('pt-BR')}\n   Total: R$ ${total}\n`;
+        });
+        relatorio += `\n═══════════════════════════════════════════════════\n`;
+        const blob = new Blob([relatorio], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `olive-faz-relatorio-${new Date().toISOString().split('T')[0]}.txt`;
+        a.click();
+      };
 
-            let html = '';
-            statuses.forEach(status => {
-                if (byStatus[status].length === 0) return;
-                html += `<h3 style="color: #D85A30; margin: 1rem 0 0.5rem 0;">${status} (${byStatus[status].length})</h3>`;
-                html += byStatus[status].map(p => `
-                    <div class="card" style="margin-bottom: 0.5rem;">
-                        <div style="font-weight: 600; font-size: 13px;">${p.name}</div>
-                        <div style="font-size: 12px; color: #888;">Cliente: ${p.client}</div>
-                    </div>
-                `).join('');
-            });
+      return React.createElement('div', { style: styles.tabPanel },
+        React.createElement('h2', { style: styles.sectionTitle }, 'Relatórios & Análises'),
+        React.createElement('div', { style: styles.metricsGrid },
+          React.createElement('div', { style: styles.metricCard },
+            React.createElement('div', { style: styles.metricLabel }, 'Total Pedidos'),
+            React.createElement('div', { style: styles.metricValue }, metricas.totalPedidos)
+          ),
+          React.createElement('div', { style: styles.metricCard },
+            React.createElement('div', { style: styles.metricLabel }, 'Faturamento'),
+            React.createElement('div', { style: styles.metricValue }, `R$ ${metricas.totalRecebido.toFixed(0)}`)
+          ),
+          React.createElement('div', { style: styles.metricCard },
+            React.createElement('div', { style: styles.metricLabel }, 'Ticket Médio'),
+            React.createElement('div', { style: styles.metricValue }, `R$ ${metricas.ticketMedio.toFixed(0)}`)
+          ),
+          React.createElement('div', { style: styles.metricCard },
+            React.createElement('div', { style: styles.metricLabel }, 'Clientes'),
+            React.createElement('div', { style: styles.metricValue }, metricas.clientesUnicos)
+          ),
+          React.createElement('div', { style: styles.metricCard },
+            React.createElement('div', { style: styles.metricLabel }, 'Concluídos'),
+            React.createElement('div', { style: styles.metricValue }, metricas.pedidosConcluidos)
+          ),
+          React.createElement('div', { style: styles.metricCard },
+            React.createElement('div', { style: styles.metricLabel }, 'Pendentes'),
+            React.createElement('div', { style: styles.metricValue }, metricas.pedidosPendentes)
+          )
+        ),
+        React.createElement('div', { style: styles.exportSection },
+          React.createElement('h3', { style: styles.exportTitle }, 'Exportar Dados'),
+          React.createElement('div', { style: styles.exportButtons },
+            React.createElement('button', {
+              style: { ...styles.btnPrimary, marginBottom: '8px', width: '100%', padding: '12px 16px' },
+              onClick: exportRelatorio
+            }, '📄 Relatório (TXT) - Compartilhe comigo'),
+            React.createElement('button', {
+              style: { ...styles.btnSecondary, marginBottom: '8px', width: '100%', padding: '12px 16px' },
+              onClick: exportCSV
+            }, '📊 Dados (CSV) - Abra em Excel'),
+            React.createElement('button', {
+              style: { ...styles.btnSecondary, width: '100%', padding: '12px 16px' },
+              onClick: exportJSON
+            }, '💾 Backup (JSON) - Cópia segura')
+          )
+        ),
+        React.createElement('div', { style: styles.infoBox },
+          React.createElement('h4', null, 'ℹ️ Como Usar'),
+          React.createElement('p', { style: { color: 'var(--text-secondary)', lineHeight: '1.8' } },
+            '📄 TXT: Envie para análise de comportamento\n📊 CSV: Gráficos e análises em Excel\n💾 JSON: Backup seguro dos seus dados'
+          )
+        )
+      );
+    }
 
-            container.innerHTML = html || '<div class="empty-state">Todas as peças prontas! 🎉</div>';
-        }
+    // ========== UTILITY COMPONENTS ==========
 
-        function renderEstoque() {
-            const container = document.getElementById('estoque-content');
-            if (stock.length === 0) {
-                container.innerHTML = '<div class="empty-state">Nenhum item de estoque</div>';
-                return;
-            }
+    function Modal({ title, onClose, children }) {
+      return React.createElement('div', {
+        style: styles.modalOverlay,
+        onClick: onClose
+      },
+        React.createElement('div', {
+          style: styles.modal,
+          onClick: e => e.stopPropagation()
+        },
+          React.createElement('div', { style: styles.modalHeader },
+            React.createElement('h2', null, title),
+            React.createElement('button', {
+              onClick: onClose,
+              style: styles.closeBtn
+            }, '✕')
+          ),
+          React.createElement('div', { style: styles.modalBody },
+            children
+          )
+        )
+      );
+    }
 
-            container.innerHTML = stock.map(s => {
-                const isLow = s.quantity <= s.alert;
-                return `
-                    <div class="card ${isLow ? 'alert' : ''}">
-                        ${isLow ? '<div style="color: #FF6B00; font-weight: 600; margin-bottom: 0.5rem;">⚠️ ESTOQUE BAIXO</div>' : ''}
-                        <div class="card-header">${s.name}</div>
-                        <div class="card-info">Quantidade: ${s.quantity} | Alerta: ${s.alert}</div>
-                        <div style="display: flex; gap: 8px; margin-top: 0.75rem;">
-                            <input type="number" value="${s.quantity}" min="0" style="flex: 1; padding: 6px; border: 1px solid #e0e0e0; border-radius: 4px;" onchange="updateStockQuantity('${s.id}', this.value)">
-                            <button class="btn-small danger" onclick="deleteStock('${s.id}')">🗑️</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+    function FormField({ label, placeholder, type = 'text', value, onChange, multiline = false, as = 'input', children, ...props }) {
+      return React.createElement('div', { style: styles.formField },
+        label && React.createElement('label', { style: styles.formLabel }, label),
+        as === 'select' ?
+          React.createElement('select', { style: styles.formInput, ...props }, children) :
+          multiline ?
+            React.createElement('textarea', {
+              style: styles.formInput,
+              placeholder,
+              value,
+              onChange,
+              rows: '3',
+              ...props
+            }) :
+            React.createElement('input', {
+              type,
+              style: styles.formInput,
+              placeholder,
+              value,
+              onChange,
+              ...props
+            })
+      );
+    }
 
-        function renderConcluidos() {
-            const container = document.getElementById('concluidos-content');
-            const completed = orders.filter(o => o.status === 'completed');
+    // ========== STYLES ==========
 
-            if (completed.length === 0) {
-                container.innerHTML = '<div class="empty-state">Nenhum pedido concluído</div>';
-                return;
-            }
+    const styles = {
+      container: {
+        minHeight: '100vh',
+        backgroundColor: 'var(--bg-secondary)',
+        color: 'var(--text-primary)',
+        fontFamily: "inherit"
+      },
+      header: {
+        backgroundColor: 'var(--coral)',
+        color: 'white',
+        padding: '24px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+      },
+      headerContent: {
+        flex: 1
+      },
+      title: {
+        fontSize: '28px',
+        fontWeight: '600',
+        margin: 0,
+        marginBottom: '4px'
+      },
+      subtitle: {
+        fontSize: '14px',
+        opacity: 0.9,
+        margin: 0
+      },
+      syncIndicator: {
+        fontSize: '12px',
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        padding: '8px 12px',
+        borderRadius: '6px'
+      },
+      tabNav: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))',
+        gap: '0',
+        backgroundColor: 'var(--bg-primary)',
+        borderBottom: '1px solid var(--border)',
+        padding: '0',
+        overflowX: 'auto'
+      },
+      tabButton: {
+        border: 'none',
+        backgroundColor: 'transparent',
+        padding: '12px 16px',
+        cursor: 'pointer',
+        fontSize: '12px',
+        color: 'var(--text-secondary)',
+        borderBottom: '2px solid transparent',
+        transition: 'all 0.2s',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '4px',
+        whiteSpace: 'nowrap'
+      },
+      tabButtonActive: {
+        color: 'var(--coral)',
+        borderBottomColor: 'var(--coral)',
+        fontWeight: '600'
+      },
+      tabContent: {
+        padding: '24px',
+        maxWidth: '1200px',
+        margin: '0 auto'
+      },
+      tabPanel: {
+        animation: 'fadeIn 0.3s ease-in'
+      },
+      sectionTitle: {
+        fontSize: '20px',
+        fontWeight: '600',
+        marginBottom: '20px',
+        color: 'var(--text-primary)'
+      },
+      headerWithButton: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px',
+        gap: '12px',
+        flexWrap: 'wrap'
+      },
+      cardGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: '16px',
+        marginBottom: '24px'
+      },
+      card: {
+        backgroundColor: 'var(--bg-primary)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        padding: '16px',
+        cursor: 'pointer',
+        transition: 'all 0.2s',
+        boxShadow: '0 0 0 transparent'
+      },
+      cardHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '12px'
+      },
+      cardTitle: {
+        fontSize: '16px',
+        fontWeight: '600',
+        margin: 0,
+        color: 'var(--text-primary)'
+      },
+      cardMeta: {
+        display: 'flex',
+        gap: '12px',
+        fontSize: '13px',
+        color: 'var(--text-secondary)',
+        marginBottom: '8px'
+      },
+      cardText: {
+        fontSize: '14px',
+        color: 'var(--text-primary)',
+        margin: '8px 0',
+        lineHeight: 1.5
+      },
+      cardSmall: {
+        fontSize: '12px',
+        color: 'var(--text-secondary)',
+        margin: '8px 0',
+        fontStyle: 'italic'
+      },
+      cardActions: {
+        display: 'flex',
+        gap: '8px',
+        marginTop: '12px',
+        flexWrap: 'wrap'
+      },
+      badge: {
+        display: 'inline-block',
+        backgroundColor: 'rgba(216, 90, 48, 0.1)',
+        color: 'var(--coral)',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        fontSize: '12px',
+        fontWeight: '500'
+      },
+      badgeAtrasado: {
+        display: 'inline-block',
+        backgroundColor: '#ffebee',
+        color: '#c62828',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        fontSize: '11px',
+        fontWeight: '600'
+      },
+      badgeSucesso: {
+        display: 'inline-block',
+        backgroundColor: '#e8f5e9',
+        color: '#2e7d32',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        fontSize: '11px',
+        fontWeight: '600'
+      },
+      btnPrimary: {
+        backgroundColor: 'var(--coral)',
+        color: 'white',
+        border: 'none',
+        padding: '10px 16px',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: '500',
+        transition: 'all 0.2s'
+      },
+      btnSecondary: {
+        backgroundColor: 'transparent',
+        color: 'var(--text-primary)',
+        border: '1px solid var(--border)',
+        padding: '10px 16px',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: '500',
+        transition: 'all 0.2s'
+      },
+      btnSmall: {
+        backgroundColor: 'transparent',
+        color: 'var(--text-secondary)',
+        border: '1px solid var(--border)',
+        padding: '6px 12px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontSize: '12px',
+        transition: 'all 0.2s'
+      },
+      btnSmallDanger: {
+        backgroundColor: 'transparent',
+        color: '#c62828',
+        border: '1px solid #ffcdd2',
+        padding: '6px 12px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontSize: '12px',
+        transition: 'all 0.2s'
+      },
+      emptyState: {
+        textAlign: 'center',
+        color: 'var(--text-secondary)',
+        padding: '32px 16px',
+        fontSize: '14px'
+      },
+      taskCardContent: {
+        flex: 1
+      },
+      taskCheckbox: {
+        width: '20px',
+        height: '20px',
+        cursor: 'pointer'
+      },
+      taskMeta: {
+        marginTop: '8px'
+      },
+      modalOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000
+      },
+      modal: {
+        backgroundColor: 'var(--bg-primary)',
+        borderRadius: '12px',
+        maxWidth: '500px',
+        width: '90%',
+        maxHeight: '90vh',
+        overflow: 'auto',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+      },
+      modalHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '20px',
+        borderBottom: '1px solid var(--border)',
+        position: 'sticky',
+        top: 0,
+        backgroundColor: 'var(--bg-primary)'
+      },
+      modalBody: {
+        padding: '20px'
+      },
+      closeBtn: {
+        background: 'none',
+        border: 'none',
+        fontSize: '24px',
+        cursor: 'pointer',
+        color: 'var(--text-secondary)',
+        padding: 0,
+        width: '24px',
+        height: '24px'
+      },
+      form: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px'
+      },
+      formField: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '6px'
+      },
+      formLabel: {
+        fontSize: '13px',
+        fontWeight: '500',
+        color: 'var(--text-primary)'
+      },
+      formInput: {
+        padding: '10px 12px',
+        border: '1px solid var(--border)',
+        borderRadius: '6px',
+        fontSize: '14px',
+        fontFamily: 'inherit',
+        color: 'var(--text-primary)',
+        backgroundColor: 'var(--bg-primary)',
+        transition: 'border-color 0.2s'
+      },
+      formRow: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '12px'
+      },
+      formActions: {
+        display: 'flex',
+        gap: '12px',
+        justifyContent: 'flex-end',
+        marginTop: '12px'
+      },
+      viewModeButtons: {
+        display: 'flex',
+        gap: '8px'
+      },
+      viewModeBtn: {
+        padding: '8px 12px',
+        border: '1px solid var(--border)',
+        backgroundColor: 'transparent',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontSize: '12px',
+        transition: 'all 0.2s'
+      },
+      viewModeBtnActive: {
+        backgroundColor: 'var(--coral)',
+        color: 'white',
+        borderColor: 'var(--coral)'
+      },
+      rastreadorGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+        gap: '16px'
+      },
+      statusCard: {
+        backgroundColor: 'var(--bg-primary)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        padding: '16px',
+        borderLeft: '4px solid var(--coral)'
+      },
+      statusTitle: {
+        fontSize: '16px',
+        fontWeight: '600',
+        color: 'var(--coral)',
+        marginBottom: '12px',
+        margin: 0
+      },
+      pecasList: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px'
+      },
+      pecaItem: {
+        padding: '8px 12px',
+        backgroundColor: 'var(--bg-secondary)',
+        borderRadius: '4px',
+        fontSize: '13px',
+        color: 'var(--text-primary)'
+      },
+      estoqueGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+        gap: '16px'
+      },
+      estoqueCard: {
+        backgroundColor: 'var(--bg-primary)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        padding: '16px'
+      },
+      estoqueHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '12px'
+      },
+      estoqueName: {
+        fontSize: '15px',
+        fontWeight: '600',
+        margin: 0
+      },
+      alertBadge: {
+        fontSize: '12px',
+        padding: '4px 8px',
+        backgroundColor: '#fff3e0',
+        borderRadius: '4px'
+      },
+      estoqueCategory: {
+        fontSize: '12px',
+        color: 'var(--text-secondary)',
+        margin: '0 0 12px 0'
+      },
+      estoqueQuantidade: {
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: '4px',
+        marginBottom: '12px'
+      },
+      quantidadeValue: {
+        fontSize: '24px',
+        fontWeight: '600',
+        color: 'var(--coral)'
+      },
+      quantidadeLimite: {
+        fontSize: '12px',
+        color: 'var(--text-secondary)'
+      },
+      quantidadeInput: {
+        width: '100%',
+        padding: '8px',
+        border: '1px solid var(--border)',
+        borderRadius: '4px',
+        fontSize: '13px'
+      },
+      calendarioGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        gap: '8px',
+        marginBottom: '24px'
+      },
+      diaHeaderCal: {
+        textAlign: 'center',
+        fontWeight: '600',
+        fontSize: '12px',
+        padding: '8px',
+        color: 'var(--text-secondary)'
+      },
+      diaCal: {
+        minHeight: '80px',
+        border: '1px solid var(--border)',
+        borderRadius: '8px',
+        padding: '8px',
+        backgroundColor: 'var(--bg-primary)',
+        cursor: 'pointer',
+        transition: 'all 0.2s'
+      },
+      diaNumero: {
+        fontSize: '13px',
+        fontWeight: '600',
+        marginBottom: '4px'
+      },
+      diaFaixas: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2px'
+      },
+      tarefaFaixa: {
+        height: '4px',
+        borderRadius: '2px',
+        opacity: 0.8
+      },
+      viewDiaContainer: {
+        backgroundColor: 'var(--bg-primary)',
+        borderRadius: '12px',
+        padding: '20px'
+      },
+      diaHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px',
+        gap: '12px'
+      },
+      diaTitle: {
+        fontSize: '18px',
+        fontWeight: '600',
+        margin: 0
+      },
+      especialLabel: {
+        fontSize: '13px',
+        color: 'var(--text-secondary)',
+        margin: '4px 0 0 0'
+      },
+      diaContent: {
+        borderTop: '1px solid var(--border)',
+        paddingTop: '16px'
+      },
+      pedidosPorMes: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px'
+      },
+      monthTitle: {
+        fontSize: '16px',
+        fontWeight: '600',
+        color: 'var(--text-primary)',
+        marginBottom: '12px'
+      },
+      pedidoDetails: {
+        fontSize: '13px',
+        color: 'var(--text-secondary)',
+        marginBottom: '12px'
+      },
+      pecasStatus: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        marginBottom: '12px',
+        paddingTop: '12px',
+        borderTop: '1px solid var(--border)'
+      },
+      pecaStatusItem: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        fontSize: '13px'
+      },
+      statusBadge: {
+        display: 'inline-block',
+        backgroundColor: 'rgba(216, 90, 48, 0.1)',
+        color: 'var(--coral)',
+        padding: '3px 6px',
+        borderRadius: '3px',
+        fontSize: '11px',
+        fontWeight: '500'
+      },
+      modalTitle: {
+        fontSize: '16px',
+        fontWeight: '600',
+        marginBottom: '12px'
+      },
+      modalContent: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px'
+      },
+      metricsGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+        gap: '12px',
+        marginBottom: '32px'
+      },
+      metricCard: {
+        backgroundColor: 'var(--bg-primary)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        padding: '16px',
+        textAlign: 'center',
+        borderTop: '3px solid var(--coral)'
+      },
+      metricLabel: {
+        fontSize: '12px',
+        color: 'var(--text-secondary)',
+        marginBottom: '8px',
+        fontWeight: '500'
+      },
+      metricValue: {
+        fontSize: '24px',
+        fontWeight: '600',
+        color: 'var(--coral)'
+      },
+      exportSection: {
+        backgroundColor: 'var(--bg-primary)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        padding: '20px',
+        marginBottom: '20px'
+      },
+      exportTitle: {
+        fontSize: '16px',
+        fontWeight: '600',
+        marginBottom: '16px',
+        margin: 0,
+        marginBottom: '16px'
+      },
+      exportButtons: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px'
+      },
+      infoBox: {
+        backgroundColor: 'rgba(216, 90, 48, 0.05)',
+        border: '1px solid rgba(216, 90, 48, 0.2)',
+        borderRadius: '12px',
+        padding: '16px',
+        marginTop: '16px'
+      }
+    };
 
-            container.innerHTML = completed.map(o => `
-                <div class="card">
-                    <div class="card-header">✅ ${o.name}</div>
-                    <div class="card-info">📅 ${o.date ? new Date(o.date).toLocaleDateString('pt-BR') : 'SEM DATA'}</div>
-                    <div class="card-total">R$ ${(o.total + o.freight).toFixed(2)}</div>
-                    <div class="card-actions">
-                        <button class="btn-small danger" onclick="deleteOrder('${o.id}')">🗑️ Deletar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Init
-        renderAll();
-    </script>
+    const root = createRoot(document.getElementById('root'));
+    root.render(React.createElement(OliveFazDashboard));
+  </script>
 </body>
 </html>
